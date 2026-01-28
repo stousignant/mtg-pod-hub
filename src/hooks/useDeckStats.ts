@@ -12,7 +12,7 @@ export const useDeckStats = () => {
           .from(DB_TABLES.DECK_STATS)
           .select('*')
           .order(DB_COLUMNS.DECK_STATS.WIN_RATE, {
-            ascending: SORT.DIRECTION.ASCENDING,
+            ascending: SORT.DIRECTION.DESCENDING,
           })
 
         if (error) {

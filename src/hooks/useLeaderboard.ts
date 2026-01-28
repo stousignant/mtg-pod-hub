@@ -22,7 +22,7 @@ export const useLeaderboard = (selectedPod?: string) => {
         const { data, error } = await query.order(
           DB_COLUMNS.POD_LEADERBOARD.POINTS,
           {
-            ascending: SORT.DIRECTION.ASCENDING,
+            ascending: SORT.DIRECTION.DESCENDING,
           }
         )
 

@@ -1,13 +1,23 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 // Create a placeholder client that will work with mock data
-// When ready to connect, ensure VITE_SUPABASE_URL and VITE_SUPABASE_KEY are set
+// When ready to connect, ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set
 export const supabase =
-  supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null
+  supabaseUrl && supabaseAnonKey
+    ? createClient(supabaseUrl, supabaseAnonKey)
+    : null
 
 export const isSupabaseConnected = (): boolean => {
-  return supabase !== null
+  const connected = supabase !== null
+  if (!connected) {
+    console.warn(
+      'Supabase not connected. Using mock data. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in .env'
+    )
+  } else {
+    console.log('✅ Supabase connected:', supabaseUrl)
+  }
+  return connected
 }

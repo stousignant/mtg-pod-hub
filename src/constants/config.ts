@@ -104,7 +104,7 @@ export const DB_COLUMNS = {
 
 export const SORT = {
   DIRECTION: {
-    ASCENDING: false,
-    DESCENDING: true,
+    ASCENDING: true,
+    DESCENDING: false,
   },
 } as const
