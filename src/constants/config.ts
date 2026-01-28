@@ -1,0 +1,110 @@
+/**
+ * Application-wide constants
+ * Centralized configuration to avoid magic numbers and strings
+ */
+
+// ==================== UI Configuration ====================
+
+export const UI = {
+  SKELETON_LOADING_COUNT: {
+    LEADERBOARD: 4,
+    DECK_STATS: 6,
+  },
+  ICON_SIZE: {
+    SMALL: 4,
+    MEDIUM: 5,
+  },
+  DECIMAL_PLACES: {
+    WIN_RATE: 1,
+  },
+} as const
+
+// ==================== Win Rate Thresholds ====================
+
+export const WIN_RATE = {
+  THRESHOLD: {
+    GOOD: 60, // >= 60% is good (green)
+    AVERAGE: 40, // >= 40% is average (amber), < 40% is poor (red)
+  },
+  COLOR: {
+    GOOD: 'text-emerald-400',
+    AVERAGE: 'text-amber-400',
+    POOR: 'text-rose-400',
+  },
+} as const
+
+// ==================== Chart Configuration ====================
+
+export const CHART = {
+  HEIGHT: 300,
+  MARGIN: {
+    TOP: 20,
+    RIGHT: 30,
+    LEFT: 20,
+    BOTTOM: 60,
+  },
+  AXIS: {
+    FONT_SIZE: 12,
+    X_LABEL_ANGLE: -45,
+    X_LABEL_HEIGHT: 60,
+    Y_DOMAIN_MIN: 0,
+    Y_DOMAIN_MAX: 100,
+  },
+  TOOLTIP: {
+    BORDER_RADIUS: 8,
+  },
+  BAR: {
+    CORNER_RADIUS: [4, 4, 0, 0] as [number, number, number, number],
+  },
+  GRADIENT_COLORS: [
+    'hsl(270, 80%, 55%)', // Purple
+    'hsl(250, 75%, 55%)',
+    'hsl(230, 70%, 55%)',
+    'hsl(220, 70%, 55%)', // Blue
+  ],
+  GRID: {
+    STROKE_DASHARRAY: '3 3',
+  },
+} as const
+
+// ==================== Ranking Configuration ====================
+
+export const RANKING = {
+  FIRST_PLACE_INDEX: 0,
+} as const
+
+// ==================== Query Keys ====================
+
+export const QUERY_KEYS = {
+  POD_LEADERBOARD: 'pod_leaderboard',
+  POD_NAMES: 'pod_names',
+  DECK_STATS: 'deck_stats',
+} as const
+
+// ==================== Database Tables ====================
+
+export const DB_TABLES = {
+  POD_LEADERBOARD: 'pod_leaderboard',
+  DECK_STATS: 'deck_stats',
+} as const
+
+// ==================== Database Columns ====================
+
+export const DB_COLUMNS = {
+  POD_LEADERBOARD: {
+    POD_NAME: 'pod_name',
+    POINTS: 'points',
+  },
+  DECK_STATS: {
+    WIN_RATE: 'win_rate',
+  },
+} as const
+
+// ==================== Sorting ====================
+
+export const SORT = {
+  DIRECTION: {
+    ASCENDING: false,
+    DESCENDING: true,
+  },
+} as const

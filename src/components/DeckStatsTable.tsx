@@ -4,7 +4,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -12,15 +12,16 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Layers } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { DeckStatsEntry } from "@/data/mockData";
+} from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Layers } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import type { DeckStatsEntry } from '@/data/mockData'
+import { UI, WIN_RATE, RANKING } from '@/constants/config'
 
 interface DeckStatsTableProps {
-  data: DeckStatsEntry[];
-  isLoading: boolean;
+  data: DeckStatsEntry[]
+  isLoading: boolean
 }
 
 const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
@@ -33,13 +34,13 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[...Array(6)].map((_, i) => (
+            {[...Array(UI.SKELETON_LOADING_COUNT.DECK_STATS)].map((_, i) => (
               <Skeleton key={i} className="h-12 w-full" />
             ))}
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -49,9 +50,7 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
           <Layers className="h-5 w-5 text-primary" />
           Deck Statistics
         </CardTitle>
-        <CardDescription>
-          All decks ranked by win rate
-        </CardDescription>
+        <CardDescription>All decks ranked by win rate</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="rounded-md border border-border overflow-hidden">
@@ -60,8 +59,12 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead>Deck</TableHead>
                 <TableHead className="hidden sm:table-cell">Owner</TableHead>
-                <TableHead className="text-center hidden md:table-cell">Games</TableHead>
-                <TableHead className="text-center hidden md:table-cell">Wins</TableHead>
+                <TableHead className="text-center hidden md:table-cell">
+                  Games
+                </TableHead>
+                <TableHead className="text-center hidden md:table-cell">
+                  Wins
+                </TableHead>
                 <TableHead className="text-right">Win Rate</TableHead>
               </TableRow>
             </TableHeader>
@@ -70,16 +73,17 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
                 <TableRow
                   key={`${deck.deck_name}-${deck.owner_name}`}
                   className={cn(
-                    "transition-colors",
-                    index === 0 && "bg-[hsl(var(--gold)/0.1)]"
+                    'transition-colors',
+                    index === RANKING.FIRST_PLACE_INDEX &&
+                      'bg-[hsl(var(--gold)/0.1)]'
                   )}
                 >
                   <TableCell>
                     <div className="flex flex-col">
                       <span
                         className={cn(
-                          "font-medium",
-                          index === 0 && "text-gold"
+                          'font-medium',
+                          index === RANKING.FIRST_PLACE_INDEX && 'text-gold'
                         )}
                       >
                         {deck.deck_name}
@@ -99,17 +103,17 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
                     {deck.wins}
                   </TableCell>
                   <TableCell className="text-right">
-                  <span
+                    <span
                       className={cn(
-                        "font-semibold",
-                        deck.win_rate >= 60
-                          ? "text-emerald-400"
-                          : deck.win_rate >= 40
-                          ? "text-amber-400"
-                          : "text-rose-400"
+                        'font-semibold',
+                        deck.win_rate >= WIN_RATE.THRESHOLD.GOOD
+                          ? WIN_RATE.COLOR.GOOD
+                          : deck.win_rate >= WIN_RATE.THRESHOLD.AVERAGE
+                            ? WIN_RATE.COLOR.AVERAGE
+                            : WIN_RATE.COLOR.POOR
                       )}
                     >
-                      {deck.win_rate.toFixed(1)}%
+                      {deck.win_rate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
                     </span>
                   </TableCell>
                 </TableRow>
@@ -119,7 +123,7 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
         </div>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default DeckStatsTable;
+export default DeckStatsTable

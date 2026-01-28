@@ -1,11 +1,11 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { cn } from '@/lib/utils'
 
 interface PlaneswalkerAvatarProps {
-  avatarUrl: string | null;
-  name: string;
-  className?: string;
-  isFirstPlace?: boolean;
+  avatarUrl: string | null
+  name: string
+  className?: string
+  isFirstPlace?: boolean
 }
 
 const PlaneswalkerAvatar = ({
@@ -17,14 +17,12 @@ const PlaneswalkerAvatar = ({
   return (
     <Avatar
       className={cn(
-        "border-2 border-border",
-        isFirstPlace && "border-[hsl(var(--gold))] glow-gold",
+        'border-2 border-border',
+        isFirstPlace && 'border-[hsl(var(--gold))] glow-gold',
         className
       )}
     >
-      {avatarUrl ? (
-        <AvatarImage src={avatarUrl} alt={name} />
-      ) : null}
+      {avatarUrl ? <AvatarImage src={avatarUrl} alt={name} /> : null}
       <AvatarFallback className="bg-muted">
         {/* Planeswalker silhouette SVG */}
         <svg
@@ -44,10 +42,7 @@ const PlaneswalkerAvatar = ({
             fill="currentColor"
           />
           {/* Mystical hood/cloak detail */}
-          <path
-            d="M4 22L8 15M20 22L16 15"
-            strokeLinecap="round"
-          />
+          <path d="M4 22L8 15M20 22L16 15" strokeLinecap="round" />
           {/* Spark symbol */}
           <path
             d="M12 7L12.5 5.5L14 6L12.5 6.5L12 8L11.5 6.5L10 6L11.5 5.5L12 7Z"
@@ -57,7 +52,7 @@ const PlaneswalkerAvatar = ({
         </svg>
       </AvatarFallback>
     </Avatar>
-  );
-};
+  )
+}
 
-export default PlaneswalkerAvatar;
+export default PlaneswalkerAvatar

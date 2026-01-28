@@ -1,14 +1,14 @@
-import { Sparkles } from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { Sparkles } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
+import { cn } from '@/lib/utils'
 
 const Header = () => {
-  const location = useLocation();
+  const location = useLocation()
 
   const navItems = [
-    { path: "/", label: "Dashboard" },
-    { path: "/statistics", label: "Statistics" },
-  ];
+    { path: '/', label: 'Dashboard' },
+    { path: '/statistics', label: 'Statistics' },
+  ]
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-sm">
@@ -24,15 +24,15 @@ const Header = () => {
         </Link>
 
         <nav className="flex items-center gap-1">
-          {navItems.map((item) => (
+          {navItems.map(item => (
             <Link
               key={item.path}
               to={item.path}
               className={cn(
-                "px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                'px-4 py-2 rounded-md text-sm font-medium transition-colors',
                 location.pathname === item.path
-                  ? "bg-primary/20 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? 'bg-primary/20 text-primary'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
               )}
             >
               {item.label}
@@ -41,7 +41,7 @@ const Header = () => {
         </nav>
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

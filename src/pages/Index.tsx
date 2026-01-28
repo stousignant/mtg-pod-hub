@@ -1,22 +1,22 @@
-import { useState, useEffect } from "react";
-import Header from "@/components/Header";
-import Leaderboard from "@/components/Leaderboard";
-import PodFilter from "@/components/PodFilter";
-import { useLeaderboard, usePodNames } from "@/hooks/useLeaderboard";
+import { useState, useEffect } from 'react'
+import Header from '@/components/Header'
+import Leaderboard from '@/components/Leaderboard'
+import PodFilter from '@/components/PodFilter'
+import { useLeaderboard, usePodNames } from '@/hooks/useLeaderboard'
 
 const Index = () => {
-  const { data: pods = [], isLoading: podsLoading } = usePodNames();
-  const [selectedPod, setSelectedPod] = useState<string>("");
+  const { data: pods = [], isLoading: podsLoading } = usePodNames()
+  const [selectedPod, setSelectedPod] = useState<string>('')
 
   // Set default pod when pods load
   useEffect(() => {
     if (pods.length > 0 && !selectedPod) {
-      setSelectedPod(pods[0]);
+      setSelectedPod(pods[0])
     }
-  }, [pods, selectedPod]);
+  }, [pods, selectedPod])
 
   const { data: leaderboardData = [], isLoading: leaderboardLoading } =
-    useLeaderboard(selectedPod);
+    useLeaderboard(selectedPod)
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,7 +44,7 @@ const Index = () => {
         />
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default Index;
+export default Index

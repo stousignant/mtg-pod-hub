@@ -1,11 +1,11 @@
-import { Trophy } from "lucide-react";
+import { Trophy } from 'lucide-react'
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card'
 import {
   Table,
   TableBody,
@@ -13,16 +13,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Skeleton } from "@/components/ui/skeleton";
-import PlaneswalkerAvatar from "./PlaneswalkerAvatar";
-import { cn } from "@/lib/utils";
-import type { PodLeaderboardEntry } from "@/data/mockData";
+} from '@/components/ui/table'
+import { Skeleton } from '@/components/ui/skeleton'
+import PlaneswalkerAvatar from './PlaneswalkerAvatar'
+import { cn } from '@/lib/utils'
+import type { PodLeaderboardEntry } from '@/data/mockData'
+import { UI, WIN_RATE, RANKING } from '@/constants/config'
 
 interface LeaderboardProps {
-  data: PodLeaderboardEntry[];
-  isLoading: boolean;
-  selectedPod: string;
+  data: PodLeaderboardEntry[]
+  isLoading: boolean
+  selectedPod: string
 }
 
 const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
@@ -35,13 +36,13 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {[...Array(4)].map((_, i) => (
+            {[...Array(UI.SKELETON_LOADING_COUNT.LEADERBOARD)].map((_, i) => (
               <Skeleton key={i} className="h-12 w-full" />
             ))}
           </div>
         </CardContent>
       </Card>
-    );
+    )
   }
 
   return (
@@ -60,22 +61,26 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead className="w-16">Rank</TableHead>
                 <TableHead>Player</TableHead>
-                <TableHead className="text-center hidden sm:table-cell">Points</TableHead>
-                <TableHead className="text-center hidden md:table-cell">Record</TableHead>
+                <TableHead className="text-center hidden sm:table-cell">
+                  Points
+                </TableHead>
+                <TableHead className="text-center hidden md:table-cell">
+                  Record
+                </TableHead>
                 <TableHead className="text-right">Win Rate</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {data.map((player, index) => {
-                const isFirstPlace = index === 0;
-                const rank = index + 1;
+                const isFirstPlace = index === RANKING.FIRST_PLACE_INDEX
+                const rank = index + 1
 
                 return (
                   <TableRow
                     key={`${player.player_name}-${player.pod_name}`}
                     className={cn(
-                      "transition-colors",
-                      isFirstPlace && "bg-[hsl(var(--gold)/0.1)]"
+                      'transition-colors',
+                      isFirstPlace && 'bg-[hsl(var(--gold)/0.1)]'
                     )}
                   >
                     <TableCell>
@@ -85,8 +90,8 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
                         ) : (
                           <span
                             className={cn(
-                              "font-semibold",
-                              isFirstPlace && "text-gold"
+                              'font-semibold',
+                              isFirstPlace && 'text-gold'
                             )}
                           >
                             {rank}
@@ -103,8 +108,8 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
                         />
                         <span
                           className={cn(
-                            "font-medium",
-                            isFirstPlace && "text-gold"
+                            'font-medium',
+                            isFirstPlace && 'text-gold'
                           )}
                         >
                           {player.player_name}
@@ -114,8 +119,8 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
                     <TableCell className="text-center hidden sm:table-cell">
                       <span
                         className={cn(
-                          "font-bold text-lg",
-                          isFirstPlace && "text-gold"
+                          'font-bold text-lg',
+                          isFirstPlace && 'text-gold'
                         )}
                       >
                         {player.points}
@@ -129,26 +134,26 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
                     <TableCell className="text-right">
                       <span
                         className={cn(
-                          "font-semibold",
-                          player.win_rate >= 60
-                            ? "text-emerald-400"
-                            : player.win_rate >= 40
-                            ? "text-amber-400"
-                            : "text-rose-400"
+                          'font-semibold',
+                          player.win_rate >= WIN_RATE.THRESHOLD.GOOD
+                            ? WIN_RATE.COLOR.GOOD
+                            : player.win_rate >= WIN_RATE.THRESHOLD.AVERAGE
+                              ? WIN_RATE.COLOR.AVERAGE
+                              : WIN_RATE.COLOR.POOR
                         )}
                       >
-                        {player.win_rate.toFixed(1)}%
+                        {player.win_rate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
                       </span>
                     </TableCell>
                   </TableRow>
-                );
+                )
               })}
             </TableBody>
           </Table>
         </div>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default Leaderboard;
+export default Leaderboard

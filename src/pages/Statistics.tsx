@@ -1,28 +1,28 @@
-import { useState, useEffect } from "react";
-import Header from "@/components/Header";
-import PodFilter from "@/components/PodFilter";
-import WinRateChart from "@/components/WinRateChart";
-import DeckStatsTable from "@/components/DeckStatsTable";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useLeaderboard, usePodNames } from "@/hooks/useLeaderboard";
-import { useDeckStats } from "@/hooks/useDeckStats";
-import { BarChart3, Layers } from "lucide-react";
+import { useState, useEffect } from 'react'
+import Header from '@/components/Header'
+import PodFilter from '@/components/PodFilter'
+import WinRateChart from '@/components/WinRateChart'
+import DeckStatsTable from '@/components/DeckStatsTable'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useLeaderboard, usePodNames } from '@/hooks/useLeaderboard'
+import { useDeckStats } from '@/hooks/useDeckStats'
+import { BarChart3, Layers } from 'lucide-react'
 
 const Statistics = () => {
-  const { data: pods = [], isLoading: podsLoading } = usePodNames();
-  const [selectedPod, setSelectedPod] = useState<string>("");
+  const { data: pods = [], isLoading: podsLoading } = usePodNames()
+  const [selectedPod, setSelectedPod] = useState<string>('')
 
   // Set default pod when pods load
   useEffect(() => {
     if (pods.length > 0 && !selectedPod) {
-      setSelectedPod(pods[0]);
+      setSelectedPod(pods[0])
     }
-  }, [pods, selectedPod]);
+  }, [pods, selectedPod])
 
   const { data: leaderboardData = [], isLoading: leaderboardLoading } =
-    useLeaderboard(selectedPod);
+    useLeaderboard(selectedPod)
   const { data: deckStatsData = [], isLoading: deckStatsLoading } =
-    useDeckStats();
+    useDeckStats()
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,7 +75,7 @@ const Statistics = () => {
         </Tabs>
       </main>
     </div>
-  );
-};
+  )
+}
 
-export default Statistics;
+export default Statistics

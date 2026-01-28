@@ -4,15 +4,15 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Filter } from "lucide-react";
+} from '@/components/ui/select'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Filter } from 'lucide-react'
 
 interface PodFilterProps {
-  pods: string[];
-  selectedPod: string;
-  onPodChange: (pod: string) => void;
-  isLoading: boolean;
+  pods: string[]
+  selectedPod: string
+  onPodChange: (pod: string) => void
+  isLoading: boolean
 }
 
 const PodFilter = ({
@@ -27,7 +27,7 @@ const PodFilter = ({
         <Filter className="h-5 w-5 text-muted-foreground" />
         <Skeleton className="h-10 w-[200px]" />
       </div>
-    );
+    )
   }
 
   return (
@@ -38,7 +38,7 @@ const PodFilter = ({
           <SelectValue placeholder="Select a pod" />
         </SelectTrigger>
         <SelectContent className="bg-card border-border">
-          {pods.map((pod) => (
+          {pods.map(pod => (
             <SelectItem
               key={pod}
               value={pod}
@@ -50,7 +50,7 @@ const PodFilter = ({
         </SelectContent>
       </Select>
     </div>
-  );
-};
+  )
+}
 
-export default PodFilter;
+export default PodFilter
