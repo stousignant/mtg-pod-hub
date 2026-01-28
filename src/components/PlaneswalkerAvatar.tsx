@@ -28,7 +28,7 @@ const PlaneswalkerAvatar = ({
         <svg
           viewBox="0 0 24 24"
           fill="none"
-          className="h-5 w-5 text-primary"
+          className="h-12 w-12 text-primary"
           stroke="currentColor"
           strokeWidth="1.5"
         >
