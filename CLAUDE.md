@@ -358,7 +358,11 @@ if (!isSupabaseConnected()) {
 
 ### Build Warnings
 
-The Lovable tagger plugin only runs in development mode and is safe to ignore in production builds.
+**Large Chunk Size:**
+The bundled JavaScript file may exceed 500 kB. Consider code-splitting with dynamic imports if this becomes a performance concern.
+
+**Browserslist Data:**
+Run `npx update-browserslist-db@latest` periodically to update browser compatibility data.
 
 ## Project-Specific Conventions
 
@@ -395,13 +399,85 @@ import { Skeleton } from '@/components/ui/skeleton'
 import type { PodLeaderboardEntry } from '@/data/mockData'
 ```
 
+## Docker Development
+
+### Local Development with Docker
+
+**Start the application:**
+
+```bash
+docker-compose up
+```
+
+The app will be available at `http://localhost:8080` with hot reload enabled.
+
+**Stop the application:**
+
+```bash
+docker-compose down
+```
+
+**Rebuild after dependency changes:**
+
+```bash
+docker-compose up --build
+```
+
+### Production Docker Build
+
+**Build production image:**
+
+```bash
+docker build -t mtg-pod-hub:latest .
+```
+
+**Run production container:**
+
+```bash
+docker run -p 80:80 \
+  -e VITE_SUPABASE_URL=your_url \
+  -e VITE_SUPABASE_ANON_KEY=your_key \
+  mtg-pod-hub:latest
+```
+
+The production image uses:
+
+- Multi-stage build for optimized size
+- Nginx for static file serving
+- Gzip compression enabled
+- Security headers configured
+- Health check endpoint at `/health`
+
+### Docker Files
+
+- `Dockerfile` - Production multi-stage build with nginx
+- `Dockerfile.dev` - Development build with hot reload
+- `docker-compose.yml` - Local development orchestration
+- `nginx.conf` - Nginx configuration for production
+- `.dockerignore` - Excludes unnecessary files from builds
+
 ## Deployment Considerations
 
-### Build Output
+### Deployment Options
+
+**Static Hosting (Vercel, Netlify, etc.):**
 
 - Vite produces optimized bundle in `dist/`
-- Static files can be deployed to any hosting (Vercel, Netlify, etc.)
 - SPA routing requires server-side redirect configuration
+- Set environment variables in hosting platform
+
+**Docker Deployment:**
+
+- Use production Dockerfile for containerized deployment
+- Can be deployed to any container platform (Railway, Fly.io, AWS ECS, etc.)
+- Nginx handles SPA routing automatically
+- Health check endpoint available at `/health`
+
+**Build Command:**
+
+```bash
+npm run build
+```
 
 ### Environment Variables
 
