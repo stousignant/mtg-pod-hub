@@ -18,6 +18,7 @@ interface LeaderboardProps {
   isLoading: boolean
   selectedPod: string
   playerCount?: number
+  gamesPlayed?: number
 }
 
 const Leaderboard = ({
@@ -25,6 +26,7 @@ const Leaderboard = ({
   isLoading,
   selectedPod,
   playerCount,
+  gamesPlayed,
 }: LeaderboardProps) => {
   if (isLoading) {
     return (
@@ -56,7 +58,19 @@ const Leaderboard = ({
         </CardTitle>
         <CardDescription>
           {selectedPod}
-          {playerCount ? ` (${formatPlayerCount(playerCount)})` : ''}
+          {(playerCount || gamesPlayed) && (
+            <>
+              {' ('}
+              {playerCount ? formatPlayerCount(playerCount) : ''}
+              {playerCount && gamesPlayed && ', '}
+              {gamesPlayed && (
+                <>
+                  {gamesPlayed} {gamesPlayed === 1 ? 'game' : 'games'}
+                </>
+              )}
+              {')'}
+            </>
+          )}
         </CardDescription>
       </CardHeader>
       <CardContent>

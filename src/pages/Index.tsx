@@ -32,9 +32,17 @@ const Index = () => {
   }, [leaderboardData])
 
   const totalGamesByPod = useMemo(() => {
-    const totals: Record<string, number> = {}
+    const gameIdsByPod: Record<string, Set<number>> = {}
     for (const entry of gameHistory) {
-      totals[entry.pod_name] = (totals[entry.pod_name] || 0) + 1
+      if (!gameIdsByPod[entry.pod_name]) {
+        gameIdsByPod[entry.pod_name] = new Set()
+      }
+      gameIdsByPod[entry.pod_name].add(entry.game_id)
+    }
+
+    const totals: Record<string, number> = {}
+    for (const [podName, gameIds] of Object.entries(gameIdsByPod)) {
+      totals[podName] = gameIds.size
     }
     return totals
   }, [gameHistory])
@@ -116,6 +124,7 @@ const Index = () => {
                 isLoading={isLoading}
                 selectedPod={podName}
                 playerCount={podPlayerCounts[podName] || 0}
+                gamesPlayed={totalGamesByPod[podName] || 0}
               />
             ))}
           </div>
@@ -125,6 +134,7 @@ const Index = () => {
             isLoading={isLoading}
             selectedPod={selectedPod}
             playerCount={podPlayerCounts[selectedPod] || 0}
+            gamesPlayed={totalGamesByPod[selectedPod] || 0}
           />
         )}
       </main>
