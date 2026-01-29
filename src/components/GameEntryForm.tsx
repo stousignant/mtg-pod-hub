@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { usePodPlayers } from '@/hooks/usePodPlayers'
 import { usePods } from '@/hooks/usePods'
@@ -62,7 +61,7 @@ export const GameEntryForm = () => {
     selectedPodId || undefined
   )
 
-  const { fields, append, remove, replace } = useFieldArray({
+  const { fields, replace } = useFieldArray({
     control: form.control,
     name: 'results',
   })
@@ -85,23 +84,16 @@ export const GameEntryForm = () => {
     try {
       await createGame.mutateAsync(data)
       toast.success('Game recorded successfully!')
-      form.reset()
+      const currentResults = form.getValues('results')
+      const resetResults = currentResults.map(result => ({
+        ...result,
+        outcome: '' as const,
+      }))
+      form.setValue('results', resetResults)
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Failed to record game'
       )
-    }
-  }
-
-  const addPlayer = () => {
-    if (fields.length < GAME_ENTRY.MAX_PLAYERS) {
-      append(emptyResult())
-    }
-  }
-
-  const removePlayer = (index: number) => {
-    if (fields.length > GAME_ENTRY.DEFAULT_PLAYER_COUNT) {
-      remove(index)
     }
   }
 
@@ -169,21 +161,7 @@ export const GameEntryForm = () => {
             <Separator />
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">Players</h3>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={addPlayer}
-                  disabled={
-                    isLoading || fields.length >= GAME_ENTRY.MAX_PLAYERS
-                  }
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Player
-                </Button>
-              </div>
+              <h3 className="text-lg font-semibold">Players</h3>
 
               {fields.map((field, index) => (
                 <PlayerResultFields
@@ -191,8 +169,6 @@ export const GameEntryForm = () => {
                   index={index}
                   form={form}
                   podPlayers={podPlayers}
-                  onRemove={() => removePlayer(index)}
-                  canRemove={fields.length > GAME_ENTRY.DEFAULT_PLAYER_COUNT}
                   isLoading={isLoading}
                 />
               ))}
@@ -220,8 +196,6 @@ interface PlayerResultFieldsProps {
   index: number
   form: ReturnType<typeof useForm<GameFormData>>
   podPlayers: PodPlayer[]
-  onRemove: () => void
-  canRemove: boolean
   isLoading: boolean
 }
 
@@ -229,8 +203,6 @@ const PlayerResultFields = ({
   index,
   form,
   podPlayers,
-  onRemove,
-  canRemove,
   isLoading,
 }: PlayerResultFieldsProps) => {
   const selectedPlayerId = form.watch(`results.${index}.player_id`)
@@ -258,7 +230,7 @@ const PlayerResultFields = ({
 
   return (
     <Card className="p-4">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FormField
           control={form.control}
           name={`results.${index}.player_id`}
@@ -349,19 +321,6 @@ const PlayerResultFields = ({
             </FormItem>
           )}
         />
-
-        <div className="flex items-end">
-          <Button
-            type="button"
-            variant="destructive"
-            size="icon"
-            onClick={onRemove}
-            disabled={isLoading || !canRemove}
-            className="w-full md:w-auto"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
       </div>
     </Card>
   )
