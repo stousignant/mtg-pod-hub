@@ -5,14 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Layers } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -35,7 +27,7 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
         <CardContent>
           <div className="space-y-4">
             {[...Array(UI.SKELETON_LOADING_COUNT.DECK_STATS)].map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
+              <Skeleton key={i} className="h-40 w-full" />
             ))}
           </div>
         </CardContent>
@@ -53,59 +45,60 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
         <CardDescription>All decks ranked by win rate</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="rounded-md border border-border overflow-hidden">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/50 hover:bg-muted/50">
-                <TableHead>Deck</TableHead>
-                <TableHead className="hidden sm:table-cell">Owner</TableHead>
-                <TableHead className="text-center hidden md:table-cell">
-                  Games
-                </TableHead>
-                <TableHead className="text-center hidden md:table-cell">
-                  Wins
-                </TableHead>
-                <TableHead className="text-right">Win Rate</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.map((deck, index) => (
-                <TableRow
-                  key={`${deck.deck_name}-${deck.owner_name}`}
-                  className={cn(
-                    'transition-colors',
-                    index === RANKING.FIRST_PLACE_INDEX &&
-                      'bg-[hsl(var(--gold)/0.1)]'
-                  )}
-                >
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span
-                        className={cn(
-                          'font-medium',
-                          index === RANKING.FIRST_PLACE_INDEX && 'text-gold'
-                        )}
-                      >
-                        {deck.deck_name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {deck.commander_name}
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell text-muted-foreground">
-                    {deck.owner_name}
-                  </TableCell>
-                  <TableCell className="text-center hidden md:table-cell">
-                    {deck.games_played}
-                  </TableCell>
-                  <TableCell className="text-center hidden md:table-cell">
-                    {deck.wins}
-                  </TableCell>
-                  <TableCell className="text-right">
+        <div className="space-y-3">
+          {data.map((deck, index) => {
+            const isFirst = index === RANKING.FIRST_PLACE_INDEX
+            const hasImage = !!deck.commander_image_url
+
+            return (
+              <div
+                key={`${deck.deck_name}-${deck.owner_name}`}
+                className={cn(
+                  'relative rounded-lg overflow-hidden border h-40 sm:h-44 transition-all duration-200 hover:border-primary/30',
+                  isFirst ? 'border-gold' : 'border-border/50'
+                )}
+                style={{
+                  backgroundImage: hasImage
+                    ? `url(${deck.commander_image_url})`
+                    : undefined,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center top',
+                }}
+              >
+                {!hasImage && (
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-900/60 to-purple-950/80" />
+                )}
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+
+                <div className="relative h-full flex items-end justify-between px-4 pb-3">
+                  <div className="flex flex-col gap-0.5">
                     <span
                       className={cn(
-                        'font-semibold',
+                        'font-bold text-base',
+                        isFirst ? 'text-gold' : 'text-white'
+                      )}
+                    >
+                      {deck.deck_name}
+                    </span>
+                    <span className="text-sm text-white/60">
+                      {deck.commander_name}
+                    </span>
+                    <span className="text-xs text-white/40 hidden sm:inline">
+                      {deck.owner_name}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-4 sm:gap-6 text-sm">
+                    <span className="text-white/60 hidden md:inline">
+                      {deck.games_played} games
+                    </span>
+                    <span className="text-white/60 hidden md:inline">
+                      {deck.wins} wins
+                    </span>
+                    <span
+                      className={cn(
+                        'font-semibold text-base',
                         deck.win_rate >= WIN_RATE.THRESHOLD.GOOD
                           ? WIN_RATE.COLOR.GOOD
                           : deck.win_rate >= WIN_RATE.THRESHOLD.AVERAGE
@@ -115,11 +108,11 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
                     >
                       {deck.win_rate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
                     </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </CardContent>
     </Card>
