@@ -79,6 +79,10 @@ export const QUERY_KEYS = {
   POD_LEADERBOARD: 'pod_leaderboard',
   POD_NAMES: 'pod_names',
   DECK_STATS: 'deck_stats',
+  PLAYERS: 'players',
+  PODS: 'pods',
+  DECKS: 'decks',
+  USER_PROFILE: 'user_profile',
 } as const
 
 // ==================== Database Tables ====================
@@ -86,6 +90,12 @@ export const QUERY_KEYS = {
 export const DB_TABLES = {
   POD_LEADERBOARD: 'pod_leaderboard',
   DECK_STATS: 'deck_stats',
+  USER_PROFILES: 'user_profiles',
+  PLAYERS: 'players',
+  PODS: 'pods',
+  DECKS: 'decks',
+  GAMES: 'games',
+  GAME_RESULTS: 'game_results',
 } as const
 
 // ==================== Database Columns ====================
@@ -108,3 +118,36 @@ export const SORT = {
     DESCENDING: false,
   },
 } as const
+
+// ==================== Authentication ====================
+
+export const AUTH = {
+  REDIRECT_PATH: {
+    AFTER_LOGIN: '/',
+    ADMIN_DASHBOARD: '/admin',
+  },
+} as const
+
+// ==================== Routes ====================
+
+export const ROUTES = {
+  HOME: '/',
+  STATISTICS: '/statistics',
+  ADMIN: '/admin',
+  LOGIN: '/login',
+} as const
+
+// ==================== Game Entry ====================
+
+export const GAME_ENTRY = {
+  DEFAULT_PLAYER_COUNT: 2,
+  MAX_PLAYERS: 4,
+} as const
+
+export const OUTCOME = {
+  WIN: 'WIN',
+  LOSS: 'LOSS',
+  DRAW: 'DRAW',
+} as const
+
+export type Outcome = (typeof OUTCOME)[keyof typeof OUTCOME]

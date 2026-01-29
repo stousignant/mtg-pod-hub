@@ -22,6 +22,24 @@ export interface DeckStatsEntry {
   win_rate: number
 }
 
+export interface Player {
+  id: string
+  name: string
+  avatar_url: string | null
+}
+
+export interface Pod {
+  id: string
+  name: string
+}
+
+export interface Deck {
+  id: string
+  name: string
+  commander_name: string
+  owner_id: string
+}
+
 export const mockPodLeaderboard: PodLeaderboardEntry[] = [
   {
     player_name: 'Archmage Viktor',
@@ -254,3 +272,110 @@ export const filterByPod = (
     .filter(entry => entry.pod_name === podName)
     .sort((a, b) => b.points - a.points)
 }
+
+export const mockPlayers: Player[] = [
+  { id: '1', name: 'Archmage Viktor', avatar_url: null },
+  {
+    id: '2',
+    name: "Liliana's Heir",
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liliana',
+  },
+  {
+    id: '3',
+    name: "Jace's Apprentice",
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jace',
+  },
+  { id: '4', name: 'Goblin King', avatar_url: null },
+  {
+    id: '5',
+    name: 'Nissa Worldwaker',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=nissa',
+  },
+  { id: '6', name: 'Chandra Ablaze', avatar_url: null },
+  {
+    id: '7',
+    name: 'Eldrazi Spawn',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=eldrazi',
+  },
+  { id: '8', name: 'Sorin Markov', avatar_url: null },
+  {
+    id: '9',
+    name: 'Tezzeret',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tezzeret',
+  },
+  { id: '10', name: 'Karn Liberated', avatar_url: null },
+  {
+    id: '11',
+    name: 'Ugin Spirit',
+    avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ugin',
+  },
+]
+
+export const mockPods: Pod[] = [
+  { id: '1', name: 'Friday Night Chaos' },
+  { id: '2', name: 'Sunday Showdown' },
+  { id: '3', name: 'Competitive League' },
+]
+
+export const mockDecks: Deck[] = [
+  {
+    id: '1',
+    name: 'Dimir Control',
+    commander_name: 'Scarab God',
+    owner_id: '1',
+  },
+  {
+    id: '2',
+    name: 'Grixis Reanimator',
+    commander_name: 'Sedris, the Traitor King',
+    owner_id: '2',
+  },
+  {
+    id: '3',
+    name: 'Mono Blue Tempo',
+    commander_name: 'Baral, Chief of Compliance',
+    owner_id: '3',
+  },
+  {
+    id: '4',
+    name: 'Krenko Goblins',
+    commander_name: 'Krenko, Mob Boss',
+    owner_id: '4',
+  },
+  {
+    id: '5',
+    name: 'Selesnya Tokens',
+    commander_name: 'Rhys the Redeemed',
+    owner_id: '5',
+  },
+  {
+    id: '6',
+    name: 'Burn Everything',
+    commander_name: 'Purphoros, God of the Forge',
+    owner_id: '6',
+  },
+  {
+    id: '7',
+    name: 'Eldrazi Menace',
+    commander_name: 'Kozilek, the Great Distortion',
+    owner_id: '9',
+  },
+  {
+    id: '8',
+    name: 'Vampire Aristocrats',
+    commander_name: 'Edgar Markov',
+    owner_id: '8',
+  },
+  {
+    id: '9',
+    name: 'Artifact Combo',
+    commander_name: 'Urza, Lord High Artificer',
+    owner_id: '10',
+  },
+  {
+    id: '10',
+    name: 'Spirit Tribal',
+    commander_name: 'Ugin, the Spirit Dragon',
+    owner_id: '11',
+  },
+]
