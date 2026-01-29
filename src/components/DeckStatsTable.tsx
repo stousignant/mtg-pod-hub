@@ -27,7 +27,7 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
         <CardContent>
           <div className="space-y-4">
             {[...Array(UI.SKELETON_LOADING_COUNT.DECK_STATS)].map((_, i) => (
-              <Skeleton key={i} className="h-40 w-full" />
+              <Skeleton key={i} className="h-32 w-full rounded-xl" />
             ))}
           </div>
         </CardContent>
@@ -45,7 +45,7 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
         <CardDescription>All decks ranked by win rate</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {data.map((deck, index) => {
             const isFirst = index === RANKING.FIRST_PLACE_INDEX
             const hasImage = !!deck.commander_image_url
@@ -54,51 +54,57 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
               <div
                 key={`${deck.deck_name}-${deck.owner_name}`}
                 className={cn(
-                  'relative rounded-lg overflow-hidden border h-40 sm:h-44 transition-all duration-200 hover:border-primary/30',
+                  'relative rounded-xl overflow-hidden border-2 transition-all duration-200 hover:border-primary/30',
                   isFirst ? 'border-gold' : 'border-border/50'
                 )}
-                style={{
-                  backgroundImage: hasImage
-                    ? `url(${deck.commander_image_url})`
-                    : undefined,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center top',
-                }}
               >
-                {!hasImage && (
-                  <div className="absolute inset-0 bg-gradient-to-r from-purple-900/60 to-purple-950/80" />
-                )}
+                {/* Commander art section */}
+                <div
+                  className="relative h-48 sm:h-72"
+                  style={{
+                    backgroundImage: hasImage
+                      ? `url(${deck.commander_image_url})`
+                      : undefined,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center center',
+                  }}
+                >
+                  {!hasImage && (
+                    <div className="absolute inset-0 bg-gradient-to-b from-purple-900/80 to-purple-950" />
+                  )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/20 to-transparent" />
 
-                <div className="relative h-full flex items-end justify-between px-4 pb-3">
-                  <div className="flex flex-col gap-0.5">
-                    <span
+                  {/* Deck name overlaid at bottom of image */}
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h3
                       className={cn(
-                        'font-bold text-base',
+                        'font-black text-xl sm:text-2xl',
                         isFirst ? 'text-gold' : 'text-white'
                       )}
                     >
                       {deck.deck_name}
-                    </span>
-                    <span className="text-sm text-white/60">
+                    </h3>
+                    <p className="text-white/70 text-sm sm:text-base">
                       {deck.commander_name}
-                    </span>
-                    <span className="text-xs text-white/40 hidden sm:inline">
-                      {deck.owner_name}
-                    </span>
+                    </p>
                   </div>
+                </div>
+
+                {/* Stats bar */}
+                <div className="bg-card/90 backdrop-blur-sm px-4 py-3 flex items-center justify-between">
+                  <span className="text-muted-foreground text-sm">
+                    {deck.owner_name}
+                  </span>
 
                   <div className="flex items-center gap-4 sm:gap-6 text-sm">
-                    <span className="text-white/60 hidden md:inline">
-                      {deck.games_played} games
-                    </span>
-                    <span className="text-white/60 hidden md:inline">
-                      {deck.wins} wins
-                    </span>
+                    <div className="flex gap-3 text-muted-foreground">
+                      <span>{deck.games_played} games</span>
+                      <span>{deck.wins} wins</span>
+                    </div>
                     <span
                       className={cn(
-                        'font-semibold text-base',
+                        'font-bold text-lg',
                         deck.win_rate >= WIN_RATE.THRESHOLD.GOOD
                           ? WIN_RATE.COLOR.GOOD
                           : deck.win_rate >= WIN_RATE.THRESHOLD.AVERAGE
