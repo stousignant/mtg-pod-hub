@@ -52,8 +52,8 @@ const Header = () => {
             <Sparkles className="h-6 w-6 text-primary transition-transform group-hover:scale-110" />
             <div className="absolute inset-0 blur-sm bg-primary/30 rounded-full" />
           </div>
-          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            MTG Pod Tracker
+          <h1 className="text-sm sm:text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent whitespace-nowrap">
+            Magic Nights Tracker
           </h1>
         </Link>
 

@@ -138,4 +138,42 @@
   .bg-gold {
     background-color: hsl(var(--gold));
   }
+
+  .border-gold {
+    border-color: hsl(var(--gold));
+  }
+
+  .foil-effect {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .foil-effect::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      hsla(300, 80%, 70%, 0.08) 45%,
+      hsla(200, 90%, 70%, 0.12) 48%,
+      hsla(50, 90%, 70%, 0.1) 51%,
+      hsla(320, 80%, 70%, 0.08) 54%,
+      transparent 60%
+    );
+    background-size: 300% 100%;
+    animation: foil-shimmer 8s linear infinite;
+    mix-blend-mode: screen;
+  }
+
+  @keyframes foil-shimmer {
+    0% {
+      background-position: 250% center;
+    }
+    100% {
+      background-position: -50% center;
+    }
+  }
 }

@@ -37,6 +37,7 @@ export const WIN_RATE = {
 
 export const CHART = {
   HEIGHT: 300,
+  HEIGHT_WITH_LEGEND: 600,
   MARGIN: {
     TOP: 20,
     RIGHT: 30,
@@ -49,6 +50,7 @@ export const CHART = {
     X_LABEL_HEIGHT: 60,
     Y_DOMAIN_MIN: 0,
     Y_DOMAIN_MAX: 100,
+    Y_AUTO_PADDING: 5,
   },
   TOOLTIP: {
     BORDER_RADIUS: 8,
@@ -57,11 +59,30 @@ export const CHART = {
     CORNER_RADIUS: [4, 4, 0, 0] as [number, number, number, number],
   },
   GRADIENT_COLORS: [
-    'hsl(270, 80%, 55%)', // Purple
+    'hsl(270, 80%, 55%)',
     'hsl(250, 75%, 55%)',
     'hsl(230, 70%, 55%)',
-    'hsl(220, 70%, 55%)', // Blue
+    'hsl(220, 70%, 55%)',
+    'hsl(340, 75%, 55%)',
+    'hsl(160, 70%, 45%)',
+    'hsl(40, 85%, 55%)',
+    'hsl(190, 75%, 50%)',
   ],
+  PLAYER_COLORS: [
+    'hsl(280, 85%, 60%)', // Vivid purple
+    'hsl(45, 95%, 55%)', // Gold/yellow
+    'hsl(160, 75%, 45%)', // Teal
+    'hsl(350, 85%, 60%)', // Rose/red
+    'hsl(200, 90%, 55%)', // Sky blue
+    'hsl(25, 90%, 55%)', // Orange
+    'hsl(120, 60%, 45%)', // Green
+    'hsl(310, 75%, 65%)', // Pink/magenta
+  ],
+  LINE: {
+    STROKE_WIDTH: 2,
+    DOT_RADIUS: 3,
+    ACTIVE_DOT_RADIUS: 5,
+  },
   GRID: {
     STROKE_DASHARRAY: '3 3',
   },
@@ -71,6 +92,12 @@ export const CHART = {
 
 export const RANKING = {
   FIRST_PLACE_INDEX: 0,
+  PODIUM_SIZE: 3,
+  PODIUM_HEIGHT: {
+    FIRST: 360,
+    SECOND: 300,
+    THIRD: 260,
+  },
 } as const
 
 // ==================== Query Keys ====================
@@ -83,6 +110,7 @@ export const QUERY_KEYS = {
   PODS: 'pods',
   DECKS: 'decks',
   USER_PROFILE: 'user_profile',
+  GAME_HISTORY: 'game_history',
 } as const
 
 // ==================== Database Tables ====================
@@ -96,6 +124,7 @@ export const DB_TABLES = {
   DECKS: 'decks',
   GAMES: 'games',
   GAME_RESULTS: 'game_results',
+  GAME_HISTORY: 'game_history',
 } as const
 
 // ==================== Database Columns ====================

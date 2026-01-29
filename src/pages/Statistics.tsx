@@ -1,28 +1,49 @@
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import Header from '@/components/Header'
-import PodFilter from '@/components/PodFilter'
-import WinRateChart from '@/components/WinRateChart'
 import DeckStatsTable from '@/components/DeckStatsTable'
+import GameTimeline from '@/components/GameTimeline'
+import OverviewStats from '@/components/OverviewStats'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useLeaderboard, usePodNames } from '@/hooks/useLeaderboard'
+import { usePodNames } from '@/hooks/useLeaderboard'
 import { useDeckStats } from '@/hooks/useDeckStats'
-import { BarChart3, Layers } from 'lucide-react'
+import { useGameHistory } from '@/hooks/useGameHistory'
+import WinRateTrendChart from '@/components/WinRateTrendChart'
+import { BarChart3, Clock, Layers, TrendingUp } from 'lucide-react'
+
+const ALL_PLAYERS_VALUE = '__all__'
+const ALL_PODS_VALUE = '__all__'
 
 const Statistics = () => {
   const { data: pods = [], isLoading: podsLoading } = usePodNames()
-  const [selectedPod, setSelectedPod] = useState<string>('')
+  const [selectedPod, setSelectedPod] = useState<string>(ALL_PODS_VALUE)
+  const [selectedOverviewPod, setSelectedOverviewPod] =
+    useState<string>(ALL_PODS_VALUE)
+  const [selectedTrendPod, setSelectedTrendPod] =
+    useState<string>(ALL_PODS_VALUE)
+  const [selectedPlayer, setSelectedPlayer] =
+    useState<string>(ALL_PLAYERS_VALUE)
+  const [hideLowPlayDecks, setHideLowPlayDecks] = useState(true)
 
-  // Set default pod when pods load
-  useEffect(() => {
-    if (pods.length > 0 && !selectedPod) {
-      setSelectedPod(pods[0])
-    }
-  }, [pods, selectedPod])
-
-  const { data: leaderboardData = [], isLoading: leaderboardLoading } =
-    useLeaderboard(selectedPod)
   const { data: deckStatsData = [], isLoading: deckStatsLoading } =
     useDeckStats()
+  const { data: gameHistoryData = [], isLoading: gameHistoryLoading } =
+    useGameHistory()
+
+  const ownerNames = useMemo(() => {
+    const unique = [...new Set(deckStatsData.map(d => d.owner_name))]
+    return unique.sort()
+  }, [deckStatsData])
+
+  const filteredDeckStats = useMemo(() => {
+    let filtered = deckStatsData
+    if (selectedPlayer !== ALL_PLAYERS_VALUE) {
+      filtered = filtered.filter(d => d.owner_name === selectedPlayer)
+    }
+    if (hideLowPlayDecks) {
+      filtered = filtered.filter(d => d.games_played > 1)
+    }
+    return filtered
+  }, [deckStatsData, selectedPlayer, hideLowPlayDecks])
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,40 +58,82 @@ const Statistics = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="pod-stats" className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="bg-muted/50 border border-border">
             <TabsTrigger
-              value="pod-stats"
+              value="overview"
               className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Pod Stats</span>
+              <span className="inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="game-history"
+              className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+            >
+              <Clock className="h-4 w-4" />
+              <span className="inline">Game History</span>
             </TabsTrigger>
             <TabsTrigger
               value="deck-stats"
               className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <Layers className="h-4 w-4" />
-              <span className="hidden sm:inline">Deck Stats</span>
+              <span className="inline">Deck Stats</span>
+            </TabsTrigger>
+            <TabsTrigger
+              value="trends"
+              className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+            >
+              <TrendingUp className="h-4 w-4" />
+              <span className="inline">Trends</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="pod-stats" className="space-y-6">
-            <PodFilter
+          <TabsContent value="overview">
+            <OverviewStats
+              data={gameHistoryData}
+              isLoading={gameHistoryLoading}
+              pods={pods}
+              selectedPod={selectedOverviewPod}
+              onPodChange={setSelectedOverviewPod}
+              podsLoading={podsLoading}
+            />
+          </TabsContent>
+
+          <TabsContent value="game-history">
+            <GameTimeline
+              data={gameHistoryData}
+              isLoading={gameHistoryLoading}
               pods={pods}
               selectedPod={selectedPod}
               onPodChange={setSelectedPod}
-              isLoading={podsLoading}
-            />
-            <WinRateChart
-              data={leaderboardData}
-              isLoading={leaderboardLoading || podsLoading}
-              selectedPod={selectedPod}
+              podsLoading={podsLoading}
             />
           </TabsContent>
 
           <TabsContent value="deck-stats">
-            <DeckStatsTable data={deckStatsData} isLoading={deckStatsLoading} />
+            <DeckStatsTable
+              data={filteredDeckStats}
+              isLoading={deckStatsLoading}
+              players={ownerNames}
+              selectedPlayer={selectedPlayer}
+              onPlayerChange={setSelectedPlayer}
+              allPlayersValue={ALL_PLAYERS_VALUE}
+              hideLowPlayDecks={hideLowPlayDecks}
+              onHideLowPlayDecksChange={setHideLowPlayDecks}
+            />
+          </TabsContent>
+
+          <TabsContent value="trends">
+            <WinRateTrendChart
+              data={gameHistoryData}
+              isLoading={gameHistoryLoading}
+              pods={pods}
+              selectedPod={selectedTrendPod}
+              onPodChange={setSelectedTrendPod}
+              podsLoading={podsLoading}
+            />
           </TabsContent>
         </Tabs>
       </main>
