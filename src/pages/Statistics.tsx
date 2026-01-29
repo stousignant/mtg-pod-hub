@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Header from '@/components/Header'
 import PodFilter from '@/components/PodFilter'
 import WinRateChart from '@/components/WinRateChart'
@@ -8,11 +8,15 @@ import { useLeaderboard, usePodNames } from '@/hooks/useLeaderboard'
 import { useDeckStats } from '@/hooks/useDeckStats'
 import { BarChart3, Layers } from 'lucide-react'
 
+const ALL_PLAYERS_VALUE = '__all__'
+
 const Statistics = () => {
   const { data: pods = [], isLoading: podsLoading } = usePodNames()
   const [selectedPod, setSelectedPod] = useState<string>('')
+  const [selectedPlayer, setSelectedPlayer] =
+    useState<string>(ALL_PLAYERS_VALUE)
+  const [hideLowPlayDecks, setHideLowPlayDecks] = useState(true)
 
-  // Set default pod when pods load
   useEffect(() => {
     if (pods.length > 0 && !selectedPod) {
       setSelectedPod(pods[0])
@@ -23,6 +27,22 @@ const Statistics = () => {
     useLeaderboard(selectedPod)
   const { data: deckStatsData = [], isLoading: deckStatsLoading } =
     useDeckStats()
+
+  const ownerNames = useMemo(() => {
+    const unique = [...new Set(deckStatsData.map(d => d.owner_name))]
+    return unique.sort()
+  }, [deckStatsData])
+
+  const filteredDeckStats = useMemo(() => {
+    let filtered = deckStatsData
+    if (selectedPlayer !== ALL_PLAYERS_VALUE) {
+      filtered = filtered.filter(d => d.owner_name === selectedPlayer)
+    }
+    if (hideLowPlayDecks) {
+      filtered = filtered.filter(d => d.games_played > 1)
+    }
+    return filtered
+  }, [deckStatsData, selectedPlayer, hideLowPlayDecks])
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,7 +90,16 @@ const Statistics = () => {
           </TabsContent>
 
           <TabsContent value="deck-stats">
-            <DeckStatsTable data={deckStatsData} isLoading={deckStatsLoading} />
+            <DeckStatsTable
+              data={filteredDeckStats}
+              isLoading={deckStatsLoading}
+              players={ownerNames}
+              selectedPlayer={selectedPlayer}
+              onPlayerChange={setSelectedPlayer}
+              allPlayersValue={ALL_PLAYERS_VALUE}
+              hideLowPlayDecks={hideLowPlayDecks}
+              onHideLowPlayDecksChange={setHideLowPlayDecks}
+            />
           </TabsContent>
         </Tabs>
       </main>

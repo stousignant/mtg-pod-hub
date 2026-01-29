@@ -9,14 +9,32 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Layers } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { DeckStatsEntry } from '@/data/mockData'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
+import PlayerFilter from './PlayerFilter'
 import { UI, WIN_RATE, RANKING } from '@/constants/config'
 
 interface DeckStatsTableProps {
   data: DeckStatsEntry[]
   isLoading: boolean
+  players: string[]
+  selectedPlayer: string
+  onPlayerChange: (player: string) => void
+  allPlayersValue: string
+  hideLowPlayDecks: boolean
+  onHideLowPlayDecksChange: (value: boolean) => void
 }
 
-const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
+const DeckStatsTable = ({
+  data,
+  isLoading,
+  players,
+  selectedPlayer,
+  onPlayerChange,
+  allPlayersValue,
+  hideLowPlayDecks,
+  onHideLowPlayDecksChange,
+}: DeckStatsTableProps) => {
   if (isLoading) {
     return (
       <Card className="glow-purple">
@@ -37,12 +55,35 @@ const DeckStatsTable = ({ data, isLoading }: DeckStatsTableProps) => {
 
   return (
     <Card className="glow-purple border-primary/20">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Layers className="h-5 w-5 text-primary" />
-          Deck Statistics
-        </CardTitle>
-        <CardDescription>All decks ranked by win rate</CardDescription>
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <CardTitle className="flex items-center gap-2">
+            <Layers className="h-5 w-5 text-primary" />
+            Deck Statistics
+          </CardTitle>
+          <CardDescription>All decks ranked by win rate</CardDescription>
+        </div>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Switch
+              id="hide-low-play"
+              checked={hideLowPlayDecks}
+              onCheckedChange={onHideLowPlayDecksChange}
+            />
+            <Label
+              htmlFor="hide-low-play"
+              className="text-sm text-muted-foreground cursor-pointer"
+            >
+              Hide low play decks
+            </Label>
+          </div>
+          <PlayerFilter
+            players={players}
+            selectedPlayer={selectedPlayer}
+            onPlayerChange={onPlayerChange}
+            allPlayersValue={allPlayersValue}
+          />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
