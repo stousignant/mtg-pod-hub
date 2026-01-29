@@ -24,20 +24,20 @@ export interface DeckStatsEntry {
 
 export interface Player {
   id: string
-  player_name: string
+  name: string
   avatar_url: string | null
 }
 
 export interface Pod {
   id: string
-  pod_name: string
+  name: string
 }
 
 export interface Deck {
   id: string
-  deck_name: string
+  name: string
   commander_name: string
-  owner: string
+  owner_id: string
 }
 
 export const mockPodLeaderboard: PodLeaderboardEntry[] = [
@@ -274,108 +274,108 @@ export const filterByPod = (
 }
 
 export const mockPlayers: Player[] = [
-  { id: '1', player_name: 'Archmage Viktor', avatar_url: null },
+  { id: '1', name: 'Archmage Viktor', avatar_url: null },
   {
     id: '2',
-    player_name: "Liliana's Heir",
+    name: "Liliana's Heir",
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=liliana',
   },
   {
     id: '3',
-    player_name: "Jace's Apprentice",
+    name: "Jace's Apprentice",
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jace',
   },
-  { id: '4', player_name: 'Goblin King', avatar_url: null },
+  { id: '4', name: 'Goblin King', avatar_url: null },
   {
     id: '5',
-    player_name: 'Nissa Worldwaker',
+    name: 'Nissa Worldwaker',
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=nissa',
   },
-  { id: '6', player_name: 'Chandra Ablaze', avatar_url: null },
+  { id: '6', name: 'Chandra Ablaze', avatar_url: null },
   {
     id: '7',
-    player_name: 'Eldrazi Spawn',
+    name: 'Eldrazi Spawn',
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=eldrazi',
   },
-  { id: '8', player_name: 'Sorin Markov', avatar_url: null },
+  { id: '8', name: 'Sorin Markov', avatar_url: null },
   {
     id: '9',
-    player_name: 'Tezzeret',
+    name: 'Tezzeret',
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=tezzeret',
   },
-  { id: '10', player_name: 'Karn Liberated', avatar_url: null },
+  { id: '10', name: 'Karn Liberated', avatar_url: null },
   {
     id: '11',
-    player_name: 'Ugin Spirit',
+    name: 'Ugin Spirit',
     avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ugin',
   },
 ]
 
 export const mockPods: Pod[] = [
-  { id: '1', pod_name: 'Friday Night Chaos' },
-  { id: '2', pod_name: 'Sunday Showdown' },
-  { id: '3', pod_name: 'Competitive League' },
+  { id: '1', name: 'Friday Night Chaos' },
+  { id: '2', name: 'Sunday Showdown' },
+  { id: '3', name: 'Competitive League' },
 ]
 
 export const mockDecks: Deck[] = [
   {
     id: '1',
-    deck_name: 'Dimir Control',
+    name: 'Dimir Control',
     commander_name: 'Scarab God',
-    owner: '1',
+    owner_id: '1',
   },
   {
     id: '2',
-    deck_name: 'Grixis Reanimator',
+    name: 'Grixis Reanimator',
     commander_name: 'Sedris, the Traitor King',
-    owner: '2',
+    owner_id: '2',
   },
   {
     id: '3',
-    deck_name: 'Mono Blue Tempo',
+    name: 'Mono Blue Tempo',
     commander_name: 'Baral, Chief of Compliance',
-    owner: '3',
+    owner_id: '3',
   },
   {
     id: '4',
-    deck_name: 'Krenko Goblins',
+    name: 'Krenko Goblins',
     commander_name: 'Krenko, Mob Boss',
-    owner: '4',
+    owner_id: '4',
   },
   {
     id: '5',
-    deck_name: 'Selesnya Tokens',
+    name: 'Selesnya Tokens',
     commander_name: 'Rhys the Redeemed',
-    owner: '5',
+    owner_id: '5',
   },
   {
     id: '6',
-    deck_name: 'Burn Everything',
+    name: 'Burn Everything',
     commander_name: 'Purphoros, God of the Forge',
-    owner: '6',
+    owner_id: '6',
   },
   {
     id: '7',
-    deck_name: 'Eldrazi Menace',
+    name: 'Eldrazi Menace',
     commander_name: 'Kozilek, the Great Distortion',
-    owner: '9',
+    owner_id: '9',
   },
   {
     id: '8',
-    deck_name: 'Vampire Aristocrats',
+    name: 'Vampire Aristocrats',
     commander_name: 'Edgar Markov',
-    owner: '8',
+    owner_id: '8',
   },
   {
     id: '9',
-    deck_name: 'Artifact Combo',
+    name: 'Artifact Combo',
     commander_name: 'Urza, Lord High Artificer',
-    owner: '10',
+    owner_id: '10',
   },
   {
     id: '10',
-    deck_name: 'Spirit Tribal',
+    name: 'Spirit Tribal',
     commander_name: 'Ugin, the Spirit Dragon',
-    owner: '11',
+    owner_id: '11',
   },
 ]

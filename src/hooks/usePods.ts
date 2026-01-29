@@ -10,8 +10,8 @@ export const usePods = () => {
       if (isSupabaseConnected() && supabase) {
         const { data, error } = await supabase
           .from(DB_TABLES.PODS)
-          .select('id, pod_name')
-          .order('pod_name')
+          .select('id, name')
+          .order('name')
 
         if (error) {
           throw new Error(error.message)
@@ -20,7 +20,7 @@ export const usePods = () => {
         return data || []
       }
 
-      return mockPods.sort((a, b) => a.pod_name.localeCompare(b.pod_name))
+      return mockPods.sort((a, b) => a.name.localeCompare(b.name))
     },
   })
 }

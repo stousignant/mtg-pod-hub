@@ -10,8 +10,8 @@ export const usePlayers = () => {
       if (isSupabaseConnected() && supabase) {
         const { data, error } = await supabase
           .from(DB_TABLES.PLAYERS)
-          .select('id, player_name, avatar_url')
-          .order('player_name')
+          .select('id, name, avatar_url')
+          .order('name')
 
         if (error) {
           throw new Error(error.message)
@@ -20,9 +20,7 @@ export const usePlayers = () => {
         return data || []
       }
 
-      return mockPlayers.sort((a, b) =>
-        a.player_name.localeCompare(b.player_name)
-      )
+      return mockPlayers.sort((a, b) => a.name.localeCompare(b.name))
     },
   })
 }

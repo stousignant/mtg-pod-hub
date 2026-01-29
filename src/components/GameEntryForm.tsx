@@ -113,7 +113,7 @@ export const GameEntryForm = () => {
                       <SelectContent>
                         {pods.map(pod => (
                           <SelectItem key={pod.id} value={pod.id}>
-                            {pod.pod_name}
+                            {pod.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -185,7 +185,7 @@ export const GameEntryForm = () => {
 interface PlayerResultFieldsProps {
   index: number
   form: ReturnType<typeof useForm<GameFormData>>
-  players: { id: string; player_name: string; avatar_url: string | null }[]
+  players: { id: string; name: string; avatar_url: string | null }[]
   onRemove: () => void
   canRemove: boolean
   isLoading: boolean
@@ -237,7 +237,7 @@ const PlayerResultFields = ({
                 <SelectContent>
                   {players.map(player => (
                     <SelectItem key={player.id} value={player.id}>
-                      {player.player_name}
+                      {player.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -270,7 +270,7 @@ const PlayerResultFields = ({
                 <SelectContent>
                   {decks.map(deck => (
                     <SelectItem key={deck.id} value={deck.id}>
-                      {deck.deck_name} ({deck.commander_name})
+                      {deck.name} ({deck.commander_name})
                     </SelectItem>
                   ))}
                 </SelectContent>

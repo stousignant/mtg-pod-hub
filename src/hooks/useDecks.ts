@@ -10,13 +10,13 @@ export const useDecks = (playerId?: string) => {
       if (isSupabaseConnected() && supabase) {
         let query = supabase
           .from(DB_TABLES.DECKS)
-          .select('id, deck_name, commander_name, owner')
+          .select('id, name, commander_name, owner_id')
 
         if (playerId) {
-          query = query.eq('owner', playerId)
+          query = query.eq('owner_id', playerId)
         }
 
-        const { data, error } = await query.order('deck_name')
+        const { data, error } = await query.order('name')
 
         if (error) {
           throw new Error(error.message)
@@ -26,12 +26,10 @@ export const useDecks = (playerId?: string) => {
       }
 
       const filteredDecks = playerId
-        ? mockDecks.filter(deck => deck.owner === playerId)
+        ? mockDecks.filter(deck => deck.owner_id === playerId)
         : mockDecks
 
-      return filteredDecks.sort((a, b) =>
-        a.deck_name.localeCompare(b.deck_name)
-      )
+      return filteredDecks.sort((a, b) => a.name.localeCompare(b.name))
     },
   })
 }
