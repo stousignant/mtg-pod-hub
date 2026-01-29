@@ -111,6 +111,7 @@ export const QUERY_KEYS = {
   DECKS: 'decks',
   USER_PROFILE: 'user_profile',
   GAME_HISTORY: 'game_history',
+  POD_MEMBERS: 'pod_members',
 } as const
 
 // ==================== Database Tables ====================
@@ -125,6 +126,7 @@ export const DB_TABLES = {
   GAMES: 'games',
   GAME_RESULTS: 'game_results',
   GAME_HISTORY: 'game_history',
+  POD_MEMBERS: 'pod_members',
 } as const
 
 // ==================== Database Columns ====================

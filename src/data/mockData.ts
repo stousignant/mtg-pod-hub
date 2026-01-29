@@ -511,6 +511,28 @@ export const mockPods: Pod[] = [
   { id: '3', name: 'Competitive League' },
 ]
 
+export interface PodMember {
+  pod_id: string
+  player_id: string
+}
+
+export const mockPodMembers: PodMember[] = [
+  // Friday Night Chaos (pod 1): players 1-4
+  { pod_id: '1', player_id: '1' },
+  { pod_id: '1', player_id: '2' },
+  { pod_id: '1', player_id: '3' },
+  { pod_id: '1', player_id: '4' },
+  // Sunday Showdown (pod 2): players 5-8
+  { pod_id: '2', player_id: '5' },
+  { pod_id: '2', player_id: '6' },
+  { pod_id: '2', player_id: '7' },
+  { pod_id: '2', player_id: '8' },
+  // Competitive League (pod 3): players 9-11
+  { pod_id: '3', player_id: '9' },
+  { pod_id: '3', player_id: '10' },
+  { pod_id: '3', player_id: '11' },
+]
+
 export const mockDecks: Deck[] = [
   {
     id: '1',
