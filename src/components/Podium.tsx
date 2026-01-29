@@ -4,59 +4,62 @@ import type { PodLeaderboardEntry } from '@/data/mockData'
 import { RANKING, UI } from '@/constants/config'
 
 interface PodiumProps {
-  players: PodLeaderboardEntry[]
+  players: (PodLeaderboardEntry & { rank: number })[]
 }
 
-const PODIUM_CONFIG = [
-  {
-    rank: 2,
-    index: 1,
-    height: RANKING.PODIUM_HEIGHT.SECOND,
-    mobileHeight: 180,
-    borderColor: 'border-gray-400',
-    glowColor: 'shadow-gray-400/30',
-    rankColor: 'text-gray-300',
-    label: '2nd',
-  },
-  {
-    rank: 1,
-    index: 0,
+const RANK_STYLES = {
+  1: {
     height: RANKING.PODIUM_HEIGHT.FIRST,
     mobileHeight: 240,
     borderColor: 'border-gold',
     glowColor: 'shadow-gold/30',
     rankColor: 'text-gold',
-    label: '1st',
   },
-  {
-    rank: 3,
-    index: 2,
+  2: {
+    height: RANKING.PODIUM_HEIGHT.SECOND,
+    mobileHeight: 180,
+    borderColor: 'border-gray-400',
+    glowColor: 'shadow-gray-400/30',
+    rankColor: 'text-gray-300',
+  },
+  3: {
     height: RANKING.PODIUM_HEIGHT.THIRD,
     mobileHeight: 180,
     borderColor: 'border-amber-700',
     glowColor: 'shadow-amber-700/30',
     rankColor: 'text-amber-600',
-    label: '3rd',
   },
-]
+}
+
+const getStyleForRank = (rank: number) => {
+  if (rank === 1) return RANK_STYLES[1]
+  if (rank === 2) return RANK_STYLES[2]
+  return RANK_STYLES[3]
+}
+
+const getRankLabel = (rank: number): string => {
+  const suffixes = ['th', 'st', 'nd', 'rd']
+  const value = rank % 100
+  return rank + (suffixes[(value - 20) % 10] || suffixes[value] || suffixes[0])
+}
 
 const PodiumCard = ({
-  config,
   player,
 }: {
-  config: (typeof PODIUM_CONFIG)[number]
-  player: PodLeaderboardEntry
+  player: PodLeaderboardEntry & { rank: number }
 }) => {
   const hasAvatar = !!player.avatar_url
+  const rankLabel = getRankLabel(player.rank)
+  const style = getStyleForRank(player.rank)
 
   return (
     <div
       className={cn(
         'relative rounded-xl overflow-hidden border-2 h-full',
         'transition-all duration-300 hover:scale-[1.02] sm:hover:scale-105',
-        config.borderColor,
-        `shadow-lg ${config.glowColor}`,
-        config.rank === 1 && 'foil-effect'
+        style.borderColor,
+        `shadow-lg ${style.glowColor}`,
+        player.rank === 1 && 'foil-effect'
       )}
       style={{
         backgroundImage: hasAvatar ? `url(${player.avatar_url})` : undefined,
@@ -72,9 +75,9 @@ const PodiumCard = ({
 
       <div className="relative h-full flex flex-col justify-end p-3 sm:p-4">
         <div className="flex items-center gap-1 mb-1">
-          {config.rank === 1 && <Trophy className="h-8 w-8 text-gold" />}
-          <span className={cn('text-3xl font-black', config.rankColor)}>
-            {config.label}
+          {player.rank === 1 && <Trophy className="h-8 w-8 text-gold" />}
+          <span className={cn('text-3xl font-black', style.rankColor)}>
+            {rankLabel}
           </span>
         </div>
 
@@ -101,52 +104,40 @@ const PodiumCard = ({
 }
 
 const Podium = ({ players }: PodiumProps) => {
-  const firstPlace = players[0]
-  const secondPlace = players[1]
-  const thirdPlace = players[2]
+  // For desktop: arrange in Olympic podium order (2-1-3) when no ties, otherwise display in order
+  const hasTies = players.length >= 2 && players[0].rank === players[1].rank
+  const desktopOrder = hasTies
+    ? players
+    : [players[1], players[0], players[2]].filter(Boolean)
 
   return (
     <div className="mb-8">
       {/* Mobile: stacked layout */}
       <div className="flex flex-col gap-3 sm:hidden">
-        {firstPlace && (
-          <div style={{ height: `${PODIUM_CONFIG[1].mobileHeight}px` }}>
-            <PodiumCard config={PODIUM_CONFIG[1]} player={firstPlace} />
-          </div>
-        )}
-        <div className="flex gap-3">
-          {secondPlace && (
+        {players.map((player, index) => {
+          const style = getStyleForRank(player.rank)
+          return (
             <div
-              className="flex-1"
-              style={{ height: `${PODIUM_CONFIG[0].mobileHeight}px` }}
+              key={`${player.player_name}-${index}`}
+              style={{ height: `${style.mobileHeight}px` }}
             >
-              <PodiumCard config={PODIUM_CONFIG[0]} player={secondPlace} />
+              <PodiumCard player={player} />
             </div>
-          )}
-          {thirdPlace && (
-            <div
-              className="flex-1"
-              style={{ height: `${PODIUM_CONFIG[2].mobileHeight}px` }}
-            >
-              <PodiumCard config={PODIUM_CONFIG[2]} player={thirdPlace} />
-            </div>
-          )}
-        </div>
+          )
+        })}
       </div>
 
       {/* Desktop: Olympic podium layout */}
       <div className="hidden sm:flex items-end justify-center gap-6">
-        {PODIUM_CONFIG.map(config => {
-          const player = players[config.index]
-          if (!player) return null
-
+        {desktopOrder.map((player, index) => {
+          const style = getStyleForRank(player.rank)
           return (
             <div
-              key={player.player_name}
+              key={`${player.player_name}-${index}`}
               className="flex-1 max-w-[280px]"
-              style={{ height: `${config.height}px` }}
+              style={{ height: `${style.height}px` }}
             >
-              <PodiumCard config={config} player={player} />
+              <PodiumCard player={player} />
             </div>
           )
         })}

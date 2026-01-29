@@ -7,13 +7,22 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Filter } from 'lucide-react'
+import { POD_FILTER } from '@/constants/config'
+import { formatPlayerCount } from '@/lib/utils'
+
+export interface PodOption {
+  name: string
+  playerCount: number
+  gamesPlayed?: number
+}
 
 interface PodFilterProps {
-  pods: string[]
+  pods: (string | PodOption)[]
   selectedPod: string
   onPodChange: (pod: string) => void
   isLoading: boolean
   allPodsValue?: string
+  showAllPods?: boolean
 }
 
 const PodFilter = ({
@@ -22,6 +31,7 @@ const PodFilter = ({
   onPodChange,
   isLoading,
   allPodsValue,
+  showAllPods = false,
 }: PodFilterProps) => {
   if (isLoading) {
     return (
@@ -32,6 +42,17 @@ const PodFilter = ({
     )
   }
 
+  const normalizedPods: PodOption[] = pods
+    .map(pod =>
+      typeof pod === 'string'
+        ? { name: pod, playerCount: 0, gamesPlayed: 0 }
+        : pod
+    )
+    .sort((a, b) => (b.gamesPlayed || 0) - (a.gamesPlayed || 0))
+
+  const hasAllPodsEntry =
+    allPodsValue && normalizedPods.some(p => p.name === allPodsValue)
+
   return (
     <div className="flex items-center gap-3">
       <Filter className="h-5 w-5 text-muted-foreground" />
@@ -40,15 +61,32 @@ const PodFilter = ({
           <SelectValue placeholder="Select a pod" />
         </SelectTrigger>
         <SelectContent className="bg-card border-border">
-          {pods.map(pod => (
+          {showAllPods && (
             <SelectItem
-              key={pod}
-              value={pod}
+              value={POD_FILTER.ALL_PODS}
               className="focus:bg-primary/20 focus:text-foreground"
             >
-              {pod === allPodsValue ? 'All Pods' : pod}
+              All Pods
             </SelectItem>
-          ))}
+          )}
+          {normalizedPods.map(pod => {
+            const isAllPodsItem = allPodsValue && pod.name === allPodsValue
+            const label = isAllPodsItem
+              ? 'All Pods'
+              : pod.playerCount > 0
+                ? `${pod.name} (${formatPlayerCount(pod.playerCount)})`
+                : pod.name
+
+            return (
+              <SelectItem
+                key={pod.name}
+                value={pod.name}
+                className="focus:bg-primary/20 focus:text-foreground"
+              >
+                {label}
+              </SelectItem>
+            )
+          })}
         </SelectContent>
       </Select>
     </div>
