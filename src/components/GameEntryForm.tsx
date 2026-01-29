@@ -97,6 +97,19 @@ export const GameEntryForm = () => {
     }
   }
 
+  const handleOutcomeChange = (changedIndex: number, value: string) => {
+    form.setValue(`results.${changedIndex}.outcome`, value)
+
+    if (value === OUTCOME.WIN) {
+      const results = form.getValues('results')
+      results.forEach((_, index) => {
+        if (index !== changedIndex) {
+          form.setValue(`results.${index}.outcome`, OUTCOME.LOSS)
+        }
+      })
+    }
+  }
+
   const isLoading = podsLoading || podPlayersLoading || createGame.isPending
 
   return (
@@ -170,6 +183,7 @@ export const GameEntryForm = () => {
                   form={form}
                   podPlayers={podPlayers}
                   isLoading={isLoading}
+                  onOutcomeChange={handleOutcomeChange}
                 />
               ))}
             </div>
@@ -197,6 +211,7 @@ interface PlayerResultFieldsProps {
   form: ReturnType<typeof useForm<GameFormData>>
   podPlayers: PodPlayer[]
   isLoading: boolean
+  onOutcomeChange: (index: number, value: string) => void
 }
 
 const PlayerResultFields = ({
@@ -204,6 +219,7 @@ const PlayerResultFields = ({
   form,
   podPlayers,
   isLoading,
+  onOutcomeChange,
 }: PlayerResultFieldsProps) => {
   const selectedPlayerId = form.watch(`results.${index}.player_id`)
   const { data: decks = [], isLoading: decksLoading } = useDecks(
@@ -300,7 +316,7 @@ const PlayerResultFields = ({
             <FormItem>
               <FormLabel>Outcome</FormLabel>
               <Select
-                onValueChange={field.onChange}
+                onValueChange={value => onOutcomeChange(index, value)}
                 value={field.value}
                 disabled={isLoading}
               >
