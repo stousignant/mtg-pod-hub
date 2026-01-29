@@ -59,14 +59,14 @@ const Statistics = () => {
               className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <Clock className="h-4 w-4" />
-              <span className="hidden sm:inline">Game History</span>
+              <span className="inline">Game History</span>
             </TabsTrigger>
             <TabsTrigger
               value="deck-stats"
               className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <Layers className="h-4 w-4" />
-              <span className="hidden sm:inline">Deck Stats</span>
+              <span className="inline">Deck Stats</span>
             </TabsTrigger>
           </TabsList>
 

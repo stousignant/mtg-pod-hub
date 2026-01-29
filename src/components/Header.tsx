@@ -53,7 +53,7 @@ const Header = () => {
             <div className="absolute inset-0 blur-sm bg-primary/30 rounded-full" />
           </div>
           <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            MTG Pod Tracker
+            Magic Nights Tracker
           </h1>
         </Link>
 

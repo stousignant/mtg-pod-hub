@@ -26,7 +26,7 @@ export const Login = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            MTG Pod Hub
+            Magic Nights Tracker
           </CardTitle>
           <CardDescription>Sign in to access admin features</CardDescription>
         </CardHeader>

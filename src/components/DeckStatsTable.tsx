@@ -107,7 +107,7 @@ const DeckStatsTable = ({
                       ? `url(${deck.commander_image_url})`
                       : undefined,
                     backgroundSize: 'cover',
-                    backgroundPosition: 'center center',
+                    backgroundPosition: 'center 25%',
                   }}
                 >
                   {!hasImage && (
