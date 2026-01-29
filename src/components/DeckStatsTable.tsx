@@ -12,6 +12,7 @@ import type { DeckStatsEntry } from '@/data/mockData'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import PlayerFilter from './PlayerFilter'
+import PodFilter from './PodFilter'
 import { UI, WIN_RATE, RANKING } from '@/constants/config'
 
 interface DeckStatsTableProps {
@@ -23,6 +24,11 @@ interface DeckStatsTableProps {
   allPlayersValue: string
   hideLowPlayDecks: boolean
   onHideLowPlayDecksChange: (value: boolean) => void
+  pods: string[]
+  selectedPod: string
+  onPodChange: (pod: string) => void
+  allPodsValue: string
+  podsLoading: boolean
 }
 
 const DeckStatsTable = ({
@@ -34,6 +40,11 @@ const DeckStatsTable = ({
   allPlayersValue,
   hideLowPlayDecks,
   onHideLowPlayDecksChange,
+  pods,
+  selectedPod,
+  onPodChange,
+  allPodsValue,
+  podsLoading,
 }: DeckStatsTableProps) => {
   if (isLoading) {
     return (
@@ -77,6 +88,13 @@ const DeckStatsTable = ({
               Hide low play decks
             </Label>
           </div>
+          <PodFilter
+            pods={[allPodsValue, ...pods]}
+            selectedPod={selectedPod}
+            onPodChange={onPodChange}
+            isLoading={podsLoading}
+            allPodsValue={allPodsValue}
+          />
           <PlayerFilter
             players={players}
             selectedPlayer={selectedPlayer}
