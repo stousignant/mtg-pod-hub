@@ -16,6 +16,8 @@ const ALL_PODS_VALUE = '__all__'
 const Statistics = () => {
   const { data: pods = [], isLoading: podsLoading } = usePodNames()
   const [selectedPod, setSelectedPod] = useState<string>(ALL_PODS_VALUE)
+  const [selectedOverviewPod, setSelectedOverviewPod] =
+    useState<string>(ALL_PODS_VALUE)
   const [selectedTrendPod, setSelectedTrendPod] =
     useState<string>(ALL_PODS_VALUE)
   const [selectedPlayer, setSelectedPlayer] =
@@ -92,6 +94,10 @@ const Statistics = () => {
             <OverviewStats
               data={gameHistoryData}
               isLoading={gameHistoryLoading}
+              pods={pods}
+              selectedPod={selectedOverviewPod}
+              onPodChange={setSelectedOverviewPod}
+              podsLoading={podsLoading}
             />
           </TabsContent>
 

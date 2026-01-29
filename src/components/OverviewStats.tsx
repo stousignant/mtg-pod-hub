@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import {
   Card,
   CardContent,
@@ -10,14 +10,18 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { BarChart3, Gamepad2, Users, MapPin, Swords } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { GameHistoryEntry } from '@/data/mockData'
-import PlayerFilter from './PlayerFilter'
+import PodFilter from './PodFilter'
 import { WIN_RATE, UI, OUTCOME } from '@/constants/config'
 
-const ALL_PLAYERS_VALUE = '__all__'
+const ALL_PODS_VALUE = '__all__'
 
 interface OverviewStatsProps {
   data: GameHistoryEntry[]
   isLoading: boolean
+  pods: string[]
+  selectedPod: string
+  onPodChange: (pod: string) => void
+  podsLoading: boolean
 }
 
 interface PlayerStats {
@@ -33,6 +37,8 @@ interface PlayerStats {
   bestDeck: string | null
   bestDeckWinRate: number
   currentStreak: string | null
+  longestWinStreak: number
+  longestLossStreak: number
 }
 
 const computeGlobalStats = (data: GameHistoryEntry[]) => {
@@ -58,6 +64,26 @@ const computeGlobalStats = (data: GameHistoryEntry[]) => {
     mostActivePod,
     mostPlayedDeck,
   }
+}
+
+const computeLongestStreak = (
+  entries: GameHistoryEntry[],
+  targetOutcome: string
+): number => {
+  const sorted = [...entries].sort(
+    (a, b) => new Date(a.played_at).getTime() - new Date(b.played_at).getTime()
+  )
+  let longest = 0
+  let current = 0
+  for (const entry of sorted) {
+    if (entry.outcome === targetOutcome) {
+      current++
+      if (current > longest) longest = current
+    } else {
+      current = 0
+    }
+  }
+  return longest
 }
 
 const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
@@ -127,12 +153,6 @@ const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
           break
         }
       }
-      const streakLabel =
-        streakOutcome === OUTCOME.WIN
-          ? 'W'
-          : streakOutcome === OUTCOME.LOSS
-            ? 'L'
-            : 'D'
       const MIN_STREAK_TO_DISPLAY = 2
       const streakWord =
         streakOutcome === OUTCOME.WIN
@@ -144,6 +164,9 @@ const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
         streakCount >= MIN_STREAK_TO_DISPLAY
           ? `${streakCount} ${streakWord} streak`
           : null
+
+      const longestWinStreak = computeLongestStreak(entries, OUTCOME.WIN)
+      const longestLossStreak = computeLongestStreak(entries, OUTCOME.LOSS)
 
       return {
         playerName,
@@ -158,6 +181,8 @@ const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
         bestDeck,
         bestDeckWinRate,
         currentStreak,
+        longestWinStreak,
+        longestLossStreak,
       }
     })
     .sort((a, b) => b.winRate - a.winRate)
@@ -185,22 +210,27 @@ const StatCard = ({
   </Card>
 )
 
-const OverviewStats = ({ data, isLoading }: OverviewStatsProps) => {
-  const [selectedPlayer, setSelectedPlayer] =
-    useState<string>(ALL_PLAYERS_VALUE)
+const OverviewStats = ({
+  data,
+  isLoading,
+  pods,
+  selectedPod,
+  onPodChange,
+  podsLoading,
+}: OverviewStatsProps) => {
+  const filteredData = useMemo(() => {
+    if (selectedPod === ALL_PODS_VALUE) return data
+    return data.filter(entry => entry.pod_name === selectedPod)
+  }, [data, selectedPod])
 
-  const globalStats = useMemo(() => computeGlobalStats(data), [data])
-  const allPlayerStats = useMemo(() => computePlayerStats(data), [data])
-
-  const playerNames = useMemo(
-    () => allPlayerStats.map(p => p.playerName),
-    [allPlayerStats]
+  const globalStats = useMemo(
+    () => computeGlobalStats(filteredData),
+    [filteredData]
   )
-
-  const displayedPlayerStats = useMemo(() => {
-    if (selectedPlayer === ALL_PLAYERS_VALUE) return allPlayerStats
-    return allPlayerStats.filter(p => p.playerName === selectedPlayer)
-  }, [allPlayerStats, selectedPlayer])
+  const allPlayerStats = useMemo(
+    () => computePlayerStats(filteredData),
+    [filteredData]
+  )
 
   if (isLoading) {
     return (
@@ -258,16 +288,17 @@ const OverviewStats = ({ data, isLoading }: OverviewStatsProps) => {
             </CardTitle>
             <CardDescription>Per-player performance overview</CardDescription>
           </div>
-          <PlayerFilter
-            players={playerNames}
-            selectedPlayer={selectedPlayer}
-            onPlayerChange={setSelectedPlayer}
-            allPlayersValue={ALL_PLAYERS_VALUE}
+          <PodFilter
+            pods={[ALL_PODS_VALUE, ...pods]}
+            selectedPod={selectedPod}
+            onPodChange={onPodChange}
+            isLoading={podsLoading}
+            allPodsValue={ALL_PODS_VALUE}
           />
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {displayedPlayerStats.map(player => {
+            {allPlayerStats.map(player => {
               const hasAvatar = !!player.avatarUrl
 
               return (
@@ -320,9 +351,19 @@ const OverviewStats = ({ data, isLoading }: OverviewStatsProps) => {
                       <span className="text-muted-foreground">
                         {player.gamesPlayed} games
                       </span>
+                      {player.longestWinStreak > 0 && (
+                        <span className="text-emerald-400 font-mono text-xs bg-emerald-500/10 px-2 py-1 rounded">
+                          Best W: {player.longestWinStreak}
+                        </span>
+                      )}
+                      {player.longestLossStreak > 0 && (
+                        <span className="text-rose-400 font-mono text-xs bg-rose-500/10 px-2 py-1 rounded">
+                          Worst L: {player.longestLossStreak}
+                        </span>
+                      )}
                       {player.currentStreak && (
                         <span className="text-muted-foreground font-mono text-xs bg-muted/50 px-2 py-1 rounded">
-                          {player.currentStreak}
+                          Current: {player.currentStreak}
                         </span>
                       )}
                     </div>
