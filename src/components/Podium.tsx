@@ -53,7 +53,8 @@ const Podium = ({ players }: PodiumProps) => {
               'relative rounded-xl overflow-hidden border-2 flex-1 max-w-[280px]',
               'transition-all duration-300 hover:scale-105',
               config.borderColor,
-              `shadow-lg ${config.glowColor}`
+              `shadow-lg ${config.glowColor}`,
+              config.rank === 1 && 'foil-effect'
             )}
             style={{
               height: `${config.height}px`,
