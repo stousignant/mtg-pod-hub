@@ -46,8 +46,19 @@ const Leaderboard = ({
     )
   }
 
-  const podiumPlayers = data.slice(0, RANKING.PODIUM_SIZE)
-  const remainingPlayers = data.slice(RANKING.PODIUM_SIZE)
+  // Calculate Olympic-style ranks (tied players get same rank, next rank skips)
+  const playersWithRanks: (PodLeaderboardEntry & { rank: number })[] = []
+  let currentRank = 1
+
+  for (let i = 0; i < data.length; i++) {
+    if (i > 0 && data[i].points !== data[i - 1].points) {
+      currentRank = i + 1
+    }
+    playersWithRanks.push({ ...data[i], rank: currentRank })
+  }
+
+  const podiumPlayers = playersWithRanks.slice(0, RANKING.PODIUM_SIZE)
+  const remainingPlayers = playersWithRanks.slice(RANKING.PODIUM_SIZE)
 
   return (
     <Card className="glow-purple border-primary/20">
@@ -78,11 +89,11 @@ const Leaderboard = ({
 
         {remainingPlayers.length > 0 && (
           <div className="space-y-2">
-            {remainingPlayers.map((player, index) => (
+            {remainingPlayers.map(player => (
               <PlayerCard
                 key={`${player.player_name}-${player.pod_name}`}
                 player={player}
-                rank={index + RANKING.PODIUM_SIZE + 1}
+                rank={player.rank}
               />
             ))}
           </div>
