@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
-import { usePlayers } from '@/hooks/usePlayers'
+import { usePodPlayers } from '@/hooks/usePodPlayers'
 import { usePods } from '@/hooks/usePods'
 import { useDecks } from '@/hooks/useDecks'
 import { useGameMutations } from '@/hooks/useGameMutations'
@@ -35,8 +35,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+const emptyResult = () => ({
+  player_id: '',
+  deck_id: '',
+  outcome: '' as const,
+})
+
 export const GameEntryForm = () => {
-  const { data: players = [], isLoading: playersLoading } = usePlayers()
   const { data: pods = [], isLoading: podsLoading } = usePods()
   const { createGame } = useGameMutations()
 
@@ -45,18 +50,36 @@ export const GameEntryForm = () => {
     defaultValues: {
       pod_id: '',
       game_date: new Date().toISOString().split('T')[0],
-      results: Array.from({ length: GAME_ENTRY.DEFAULT_PLAYER_COUNT }, () => ({
-        player_id: '',
-        deck_id: '',
-        outcome: '' as const,
-      })),
+      results: Array.from(
+        { length: GAME_ENTRY.DEFAULT_PLAYER_COUNT },
+        emptyResult
+      ),
     },
   })
 
-  const { fields, append, remove } = useFieldArray({
+  const selectedPodId = form.watch('pod_id')
+  const { data: podPlayers = [], isLoading: podPlayersLoading } = usePodPlayers(
+    selectedPodId || undefined
+  )
+
+  const { fields, append, remove, replace } = useFieldArray({
     control: form.control,
     name: 'results',
   })
+
+  useEffect(() => {
+    if (!selectedPodId || podPlayers.length === 0) {
+      return
+    }
+
+    const results = podPlayers.map(player => ({
+      player_id: String(player.id),
+      deck_id: '',
+      outcome: '' as const,
+    }))
+
+    replace(results)
+  }, [selectedPodId, podPlayers, replace])
 
   const onSubmit = async (data: GameFormData) => {
     try {
@@ -72,7 +95,7 @@ export const GameEntryForm = () => {
 
   const addPlayer = () => {
     if (fields.length < GAME_ENTRY.MAX_PLAYERS) {
-      append({ player_id: '', deck_id: '', outcome: '' as const })
+      append(emptyResult())
     }
   }
 
@@ -82,7 +105,7 @@ export const GameEntryForm = () => {
     }
   }
 
-  const isLoading = playersLoading || podsLoading || createGame.isPending
+  const isLoading = podsLoading || podPlayersLoading || createGame.isPending
 
   return (
     <Card>
@@ -167,7 +190,7 @@ export const GameEntryForm = () => {
                   key={field.id}
                   index={index}
                   form={form}
-                  players={players}
+                  podPlayers={podPlayers}
                   onRemove={() => removePlayer(index)}
                   canRemove={fields.length > GAME_ENTRY.DEFAULT_PLAYER_COUNT}
                   isLoading={isLoading}
@@ -187,10 +210,16 @@ export const GameEntryForm = () => {
   )
 }
 
+interface PodPlayer {
+  id: number
+  name: string
+  avatar_url: string | null
+}
+
 interface PlayerResultFieldsProps {
   index: number
   form: ReturnType<typeof useForm<GameFormData>>
-  players: { id: string; name: string; avatar_url: string | null }[]
+  podPlayers: PodPlayer[]
   onRemove: () => void
   canRemove: boolean
   isLoading: boolean
@@ -199,7 +228,7 @@ interface PlayerResultFieldsProps {
 const PlayerResultFields = ({
   index,
   form,
-  players,
+  podPlayers,
   onRemove,
   canRemove,
   isLoading,
@@ -214,6 +243,12 @@ const PlayerResultFields = ({
       form.setValue(`results.${index}.deck_id`, '')
     }
   }, [selectedPlayerId, form, index])
+
+  useEffect(() => {
+    if (decks.length === 1 && selectedPlayerId) {
+      form.setValue(`results.${index}.deck_id`, String(decks[0].id))
+    }
+  }, [decks, selectedPlayerId, form, index])
 
   const outcomeOptions = [
     { value: OUTCOME.WIN, label: 'Win' },
@@ -241,7 +276,7 @@ const PlayerResultFields = ({
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {players.map(player => (
+                  {podPlayers.map(player => (
                     <SelectItem key={player.id} value={String(player.id)}>
                       {player.name}
                     </SelectItem>
