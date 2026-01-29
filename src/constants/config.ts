@@ -170,6 +170,10 @@ export const ROUTES = {
 
 // ==================== Game Entry ====================
 
+export const POD_FILTER = {
+  ALL_PODS: '__all_pods__',
+} as const
+
 export const GAME_ENTRY = {
   DEFAULT_PLAYER_COUNT: 2,
   MAX_PLAYERS: 4,

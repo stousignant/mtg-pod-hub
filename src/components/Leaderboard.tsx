@@ -16,9 +16,15 @@ interface LeaderboardProps {
   data: PodLeaderboardEntry[]
   isLoading: boolean
   selectedPod: string
+  playerCount?: number
 }
 
-const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
+const Leaderboard = ({
+  data,
+  isLoading,
+  selectedPod,
+  playerCount,
+}: LeaderboardProps) => {
   if (isLoading) {
     return (
       <Card className="glow-purple">
@@ -47,7 +53,10 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
           <Trophy className="h-5 w-5 text-primary" />
           Leaderboard
         </CardTitle>
-        <CardDescription>{selectedPod}</CardDescription>
+        <CardDescription>
+          {selectedPod}
+          {playerCount ? ` (${playerCount})` : ''}
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {podiumPlayers.length > 0 && <Podium players={podiumPlayers} />}
