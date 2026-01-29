@@ -37,7 +37,7 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
         <CardContent>
           <div className="space-y-4">
             {[...Array(UI.SKELETON_LOADING_COUNT.LEADERBOARD)].map((_, i) => (
-              <Skeleton key={i} className="h-12 w-full" />
+              <Skeleton key={i} className="h-28 w-full" />
             ))}
           </div>
         </CardContent>
@@ -79,7 +79,7 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
                   <TableRow
                     key={`${player.player_name}-${player.pod_name}`}
                     className={cn(
-                      'transition-colors',
+                      'transition-colors h-28',
                       isFirstPlace && 'bg-[hsl(var(--gold)/0.1)]'
                     )}
                   >
@@ -100,15 +100,16 @@ const Leaderboard = ({ data, isLoading, selectedPod }: LeaderboardProps) => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-5">
                         <PlaneswalkerAvatar
                           avatarUrl={player.avatar_url}
                           name={player.player_name}
                           isFirstPlace={isFirstPlace}
+                          className="h-20 w-20"
                         />
                         <span
                           className={cn(
-                            'font-medium',
+                            'font-medium text-lg',
                             isFirstPlace && 'text-gold'
                           )}
                         >
