@@ -71,6 +71,12 @@ export const CHART = {
 
 export const RANKING = {
   FIRST_PLACE_INDEX: 0,
+  PODIUM_SIZE: 3,
+  PODIUM_HEIGHT: {
+    FIRST: 280,
+    SECOND: 240,
+    THIRD: 200,
+  },
 } as const
 
 // ==================== Query Keys ====================
