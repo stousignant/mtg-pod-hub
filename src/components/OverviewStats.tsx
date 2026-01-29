@@ -8,10 +8,9 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { BarChart3, Gamepad2, Users, MapPin, Swords } from 'lucide-react'
-import { cn } from '@/lib/utils'
 import type { GameHistoryEntry } from '@/data/mockData'
 import PodFilter from './PodFilter'
-import { WIN_RATE, UI, OUTCOME } from '@/constants/config'
+import { UI, OUTCOME } from '@/constants/config'
 
 const ALL_PODS_VALUE = '__all__'
 
@@ -374,16 +373,7 @@ const OverviewStats = ({
                         <span className="text-amber-400">{player.draws}D</span>
                         <span className="text-rose-400">{player.losses}L</span>
                       </div>
-                      <span
-                        className={cn(
-                          'font-bold text-lg',
-                          player.winRate >= WIN_RATE.THRESHOLD.GOOD
-                            ? WIN_RATE.COLOR.GOOD
-                            : player.winRate >= WIN_RATE.THRESHOLD.AVERAGE
-                              ? WIN_RATE.COLOR.AVERAGE
-                              : WIN_RATE.COLOR.POOR
-                        )}
-                      >
+                      <span className="font-bold text-lg text-amber-400">
                         {player.winRate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
                       </span>
                     </div>
