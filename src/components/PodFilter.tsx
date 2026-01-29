@@ -13,6 +13,7 @@ interface PodFilterProps {
   selectedPod: string
   onPodChange: (pod: string) => void
   isLoading: boolean
+  allPodsValue?: string
 }
 
 const PodFilter = ({
@@ -20,6 +21,7 @@ const PodFilter = ({
   selectedPod,
   onPodChange,
   isLoading,
+  allPodsValue,
 }: PodFilterProps) => {
   if (isLoading) {
     return (
@@ -44,7 +46,7 @@ const PodFilter = ({
               value={pod}
               className="focus:bg-primary/20 focus:text-foreground"
             >
-              {pod}
+              {pod === allPodsValue ? 'All Pods' : pod}
             </SelectItem>
           ))}
         </SelectContent>

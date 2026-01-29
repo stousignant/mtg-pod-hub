@@ -13,6 +13,18 @@ export interface PodLeaderboardEntry {
   win_rate: number
 }
 
+export interface GameHistoryEntry {
+  game_id: number
+  played_at: string
+  pod_name: string
+  outcome: string
+  player_name: string
+  player_avatar_url: string | null
+  deck_name: string
+  commander_name: string
+  commander_image_url: string | null
+}
+
 export interface DeckStatsEntry {
   deck_name: string
   commander_name: string
@@ -293,6 +305,167 @@ export const filterByPod = (
     .filter(entry => entry.pod_name === podName)
     .sort((a, b) => b.points - a.points)
 }
+
+export const mockGameHistory: GameHistoryEntry[] = [
+  {
+    game_id: 1,
+    played_at: '2025-01-25',
+    pod_name: 'Friday Night Chaos',
+    outcome: 'WIN',
+    player_name: 'Tezzeret',
+    player_avatar_url:
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=tezzeret',
+    deck_name: 'Eldrazi Menace',
+    commander_name: 'Kozilek, the Great Distortion',
+    commander_image_url: null,
+  },
+  {
+    game_id: 1,
+    played_at: '2025-01-25',
+    pod_name: 'Friday Night Chaos',
+    outcome: 'LOSS',
+    player_name: 'Archmage Viktor',
+    player_avatar_url: null,
+    deck_name: 'Dimir Control',
+    commander_name: 'Scarab God',
+    commander_image_url: null,
+  },
+  {
+    game_id: 1,
+    played_at: '2025-01-25',
+    pod_name: 'Friday Night Chaos',
+    outcome: 'LOSS',
+    player_name: 'Karn Liberated',
+    player_avatar_url: null,
+    deck_name: 'Artifact Combo',
+    commander_name: 'Urza, Lord High Artificer',
+    commander_image_url: null,
+  },
+  {
+    game_id: 1,
+    played_at: '2025-01-25',
+    pod_name: 'Friday Night Chaos',
+    outcome: 'LOSS',
+    player_name: 'Goblin King',
+    player_avatar_url: null,
+    deck_name: 'Krenko Goblins',
+    commander_name: 'Krenko, Mob Boss',
+    commander_image_url: null,
+  },
+  {
+    game_id: 2,
+    played_at: '2025-01-24',
+    pod_name: 'Sunday Showdown',
+    outcome: 'WIN',
+    player_name: 'Nissa Worldwaker',
+    player_avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=nissa',
+    deck_name: 'Selesnya Tokens',
+    commander_name: 'Rhys the Redeemed',
+    commander_image_url: null,
+  },
+  {
+    game_id: 2,
+    played_at: '2025-01-24',
+    pod_name: 'Sunday Showdown',
+    outcome: 'LOSS',
+    player_name: 'Chandra Ablaze',
+    player_avatar_url: null,
+    deck_name: 'Burn Everything',
+    commander_name: 'Purphoros, God of the Forge',
+    commander_image_url: null,
+  },
+  {
+    game_id: 2,
+    played_at: '2025-01-24',
+    pod_name: 'Sunday Showdown',
+    outcome: 'LOSS',
+    player_name: 'Sorin Markov',
+    player_avatar_url: null,
+    deck_name: 'Vampire Aristocrats',
+    commander_name: 'Edgar Markov',
+    commander_image_url: null,
+  },
+  {
+    game_id: 3,
+    played_at: '2025-01-20',
+    pod_name: 'Friday Night Chaos',
+    outcome: 'DRAW',
+    player_name: 'Archmage Viktor',
+    player_avatar_url: null,
+    deck_name: 'Dimir Control',
+    commander_name: 'Scarab God',
+    commander_image_url: null,
+  },
+  {
+    game_id: 3,
+    played_at: '2025-01-20',
+    pod_name: 'Friday Night Chaos',
+    outcome: 'DRAW',
+    player_name: "Liliana's Heir",
+    player_avatar_url:
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=liliana',
+    deck_name: 'Grixis Reanimator',
+    commander_name: 'Sedris, the Traitor King',
+    commander_image_url: null,
+  },
+  {
+    game_id: 3,
+    played_at: '2025-01-20',
+    pod_name: 'Friday Night Chaos',
+    outcome: 'LOSS',
+    player_name: 'Ugin Spirit',
+    player_avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=ugin',
+    deck_name: 'Spirit Tribal',
+    commander_name: 'Ugin, the Spirit Dragon',
+    commander_image_url: null,
+  },
+  {
+    game_id: 3,
+    played_at: '2025-01-20',
+    pod_name: 'Friday Night Chaos',
+    outcome: 'LOSS',
+    player_name: "Jace's Apprentice",
+    player_avatar_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=jace',
+    deck_name: 'Mono Blue Tempo',
+    commander_name: 'Baral, Chief of Compliance',
+    commander_image_url: null,
+  },
+  {
+    game_id: 4,
+    played_at: '2025-01-18',
+    pod_name: 'Competitive League',
+    outcome: 'WIN',
+    player_name: 'Karn Liberated',
+    player_avatar_url: null,
+    deck_name: 'Artifact Combo',
+    commander_name: 'Urza, Lord High Artificer',
+    commander_image_url: null,
+  },
+  {
+    game_id: 4,
+    played_at: '2025-01-18',
+    pod_name: 'Competitive League',
+    outcome: 'LOSS',
+    player_name: 'Eldrazi Spawn',
+    player_avatar_url:
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=eldrazi',
+    deck_name: 'Eldrazi Menace',
+    commander_name: 'Kozilek, the Great Distortion',
+    commander_image_url: null,
+  },
+  {
+    game_id: 4,
+    played_at: '2025-01-18',
+    pod_name: 'Competitive League',
+    outcome: 'LOSS',
+    player_name: 'Tezzeret',
+    player_avatar_url:
+      'https://api.dicebear.com/7.x/avataaars/svg?seed=tezzeret',
+    deck_name: 'Eldrazi Menace',
+    commander_name: 'Kozilek, the Great Distortion',
+    commander_image_url: null,
+  },
+]
 
 export const mockPlayers: Player[] = [
   { id: '1', name: 'Archmage Viktor', avatar_url: null },

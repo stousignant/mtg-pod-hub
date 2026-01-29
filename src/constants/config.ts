@@ -89,6 +89,7 @@ export const QUERY_KEYS = {
   PODS: 'pods',
   DECKS: 'decks',
   USER_PROFILE: 'user_profile',
+  GAME_HISTORY: 'game_history',
 } as const
 
 // ==================== Database Tables ====================
@@ -102,6 +103,7 @@ export const DB_TABLES = {
   DECKS: 'decks',
   GAMES: 'games',
   GAME_RESULTS: 'game_results',
+  GAME_HISTORY: 'game_history',
 } as const
 
 // ==================== Database Columns ====================

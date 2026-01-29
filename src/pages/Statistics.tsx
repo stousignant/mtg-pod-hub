@@ -1,32 +1,27 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import Header from '@/components/Header'
-import PodFilter from '@/components/PodFilter'
-import WinRateChart from '@/components/WinRateChart'
 import DeckStatsTable from '@/components/DeckStatsTable'
+import GameTimeline from '@/components/GameTimeline'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useLeaderboard, usePodNames } from '@/hooks/useLeaderboard'
+import { usePodNames } from '@/hooks/useLeaderboard'
 import { useDeckStats } from '@/hooks/useDeckStats'
-import { BarChart3, Layers } from 'lucide-react'
+import { useGameHistory } from '@/hooks/useGameHistory'
+import { Clock, Layers } from 'lucide-react'
 
 const ALL_PLAYERS_VALUE = '__all__'
+const ALL_PODS_VALUE = '__all__'
 
 const Statistics = () => {
   const { data: pods = [], isLoading: podsLoading } = usePodNames()
-  const [selectedPod, setSelectedPod] = useState<string>('')
+  const [selectedPod, setSelectedPod] = useState<string>(ALL_PODS_VALUE)
   const [selectedPlayer, setSelectedPlayer] =
     useState<string>(ALL_PLAYERS_VALUE)
   const [hideLowPlayDecks, setHideLowPlayDecks] = useState(true)
 
-  useEffect(() => {
-    if (pods.length > 0 && !selectedPod) {
-      setSelectedPod(pods[0])
-    }
-  }, [pods, selectedPod])
-
-  const { data: leaderboardData = [], isLoading: leaderboardLoading } =
-    useLeaderboard(selectedPod)
   const { data: deckStatsData = [], isLoading: deckStatsLoading } =
     useDeckStats()
+  const { data: gameHistoryData = [], isLoading: gameHistoryLoading } =
+    useGameHistory()
 
   const ownerNames = useMemo(() => {
     const unique = [...new Set(deckStatsData.map(d => d.owner_name))]
@@ -57,14 +52,14 @@ const Statistics = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="pod-stats" className="space-y-6">
+        <Tabs defaultValue="game-history" className="space-y-6">
           <TabsList className="bg-muted/50 border border-border">
             <TabsTrigger
-              value="pod-stats"
+              value="game-history"
               className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Pod Stats</span>
+              <Clock className="h-4 w-4" />
+              <span className="hidden sm:inline">Game History</span>
             </TabsTrigger>
             <TabsTrigger
               value="deck-stats"
@@ -75,17 +70,14 @@ const Statistics = () => {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="pod-stats" className="space-y-6">
-            <PodFilter
+          <TabsContent value="game-history">
+            <GameTimeline
+              data={gameHistoryData}
+              isLoading={gameHistoryLoading}
               pods={pods}
               selectedPod={selectedPod}
               onPodChange={setSelectedPod}
-              isLoading={podsLoading}
-            />
-            <WinRateChart
-              data={leaderboardData}
-              isLoading={leaderboardLoading || podsLoading}
-              selectedPod={selectedPod}
+              podsLoading={podsLoading}
             />
           </TabsContent>
 
