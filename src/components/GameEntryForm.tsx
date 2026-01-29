@@ -8,7 +8,7 @@ import { usePods } from '@/hooks/usePods'
 import { useDecks } from '@/hooks/useDecks'
 import { useGameMutations } from '@/hooks/useGameMutations'
 import { gameFormSchema, type GameFormData } from '@/schemas/gameSchema'
-import { GAME_ENTRY } from '@/constants/config'
+import { GAME_ENTRY, OUTCOME } from '@/constants/config'
 import {
   Card,
   CardContent,
@@ -48,7 +48,7 @@ export const GameEntryForm = () => {
       results: Array.from({ length: GAME_ENTRY.DEFAULT_PLAYER_COUNT }, () => ({
         player_id: '',
         deck_id: '',
-        placement: 1,
+        outcome: '' as const,
       })),
     },
   })
@@ -72,7 +72,7 @@ export const GameEntryForm = () => {
 
   const addPlayer = () => {
     if (fields.length < GAME_ENTRY.MAX_PLAYERS) {
-      append({ player_id: '', deck_id: '', placement: fields.length + 1 })
+      append({ player_id: '', deck_id: '', outcome: '' as const })
     }
   }
 
@@ -215,10 +215,11 @@ const PlayerResultFields = ({
     }
   }, [selectedPlayerId, form, index])
 
-  const placementOptions = Array.from(
-    { length: GAME_ENTRY.MAX_PLAYERS },
-    (_, i) => i + 1
-  )
+  const outcomeOptions = [
+    { value: OUTCOME.WIN, label: 'Win' },
+    { value: OUTCOME.DRAW, label: 'Draw' },
+    { value: OUTCOME.LOSS, label: 'Loss' },
+  ]
 
   return (
     <Card className="p-4">
@@ -287,24 +288,24 @@ const PlayerResultFields = ({
 
         <FormField
           control={form.control}
-          name={`results.${index}.placement`}
+          name={`results.${index}.outcome`}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Placement</FormLabel>
+              <FormLabel>Outcome</FormLabel>
               <Select
-                onValueChange={value => field.onChange(Number(value))}
-                value={field.value.toString()}
+                onValueChange={field.onChange}
+                value={field.value}
                 disabled={isLoading}
               >
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select placement" />
+                    <SelectValue placeholder="Select outcome" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {placementOptions.map(placement => (
-                    <SelectItem key={placement} value={placement.toString()}>
-                      {placement}
+                  {outcomeOptions.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
                     </SelectItem>
                   ))}
                 </SelectContent>

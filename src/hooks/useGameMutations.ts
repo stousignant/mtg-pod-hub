@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '@/lib/supabaseClient'
-import { QUERY_KEYS, DB_TABLES } from '@/constants/config'
+import { QUERY_KEYS, DB_TABLES, type Outcome } from '@/constants/config'
 
 interface GameResult {
   player_id: string
   deck_id: string
-  placement: number
+  outcome: Outcome
 }
 
 interface CreateGameInput {
@@ -35,7 +35,7 @@ export const useGameMutations = () => {
         .from(DB_TABLES.GAMES)
         .insert({
           pod_id: input.pod_id,
-          game_date: input.game_date,
+          played_at: input.game_date,
           created_by: user.id,
         })
         .select()
@@ -49,7 +49,7 @@ export const useGameMutations = () => {
         game_id: gameData.id,
         player_id: result.player_id,
         deck_id: result.deck_id,
-        placement: result.placement,
+        outcome: result.outcome,
       }))
 
       const { error: resultsError } = await supabase

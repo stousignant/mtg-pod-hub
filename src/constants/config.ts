@@ -142,8 +142,12 @@ export const ROUTES = {
 export const GAME_ENTRY = {
   DEFAULT_PLAYER_COUNT: 2,
   MAX_PLAYERS: 4,
-  PLACEMENT: {
-    MIN: 1,
-    MAX: 4,
-  },
 } as const
+
+export const OUTCOME = {
+  WIN: 'WIN',
+  LOSS: 'LOSS',
+  DRAW: 'DRAW',
+} as const
+
+export type Outcome = (typeof OUTCOME)[keyof typeof OUTCOME]
