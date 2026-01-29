@@ -1,16 +1,9 @@
-import { cn } from '@/lib/utils'
 import type { PodLeaderboardEntry } from '@/data/mockData'
-import { WIN_RATE, UI } from '@/constants/config'
+import { UI } from '@/constants/config'
 
 interface PlayerCardProps {
   player: PodLeaderboardEntry
   rank: number
-}
-
-const getWinRateColor = (winRate: number) => {
-  if (winRate >= WIN_RATE.THRESHOLD.GOOD) return WIN_RATE.COLOR.GOOD
-  if (winRate >= WIN_RATE.THRESHOLD.AVERAGE) return WIN_RATE.COLOR.AVERAGE
-  return WIN_RATE.COLOR.POOR
 }
 
 const PlayerCard = ({ player, rank }: PlayerCardProps) => {
@@ -18,7 +11,7 @@ const PlayerCard = ({ player, rank }: PlayerCardProps) => {
 
   return (
     <div
-      className="relative rounded-lg overflow-hidden border border-border/50 h-20 transition-all duration-200 hover:border-primary/30"
+      className="relative rounded-lg overflow-hidden border border-border/50 h-28 transition-all duration-200 hover:border-primary/30"
       style={{
         backgroundImage: hasAvatar ? `url(${player.avatar_url})` : undefined,
         backgroundSize: 'cover',
@@ -33,7 +26,7 @@ const PlayerCard = ({ player, rank }: PlayerCardProps) => {
 
       <div className="relative h-full flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <span className="text-muted-foreground font-bold text-lg w-8">
+          <span className="text-muted-foreground font-black text-3xl w-12">
             {rank}
           </span>
           <span className="text-white font-medium truncate">
@@ -46,11 +39,9 @@ const PlayerCard = ({ player, rank }: PlayerCardProps) => {
             {player.points} pts
           </span>
           <span className="text-white/60 hidden md:inline">
-            {player.wins}-{player.draws}-{player.losses}
+            W: {player.wins} D: {player.draws} L: {player.losses}
           </span>
-          <span
-            className={cn('font-semibold', getWinRateColor(player.win_rate))}
-          >
+          <span className="font-semibold text-amber-400">
             {player.win_rate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
           </span>
         </div>

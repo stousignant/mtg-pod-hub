@@ -1,7 +1,7 @@
 import { Trophy } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { PodLeaderboardEntry } from '@/data/mockData'
-import { RANKING, WIN_RATE, UI } from '@/constants/config'
+import { RANKING, UI } from '@/constants/config'
 
 interface PodiumProps {
   players: PodLeaderboardEntry[]
@@ -37,15 +37,9 @@ const PODIUM_CONFIG = [
   },
 ]
 
-const getWinRateColor = (winRate: number) => {
-  if (winRate >= WIN_RATE.THRESHOLD.GOOD) return WIN_RATE.COLOR.GOOD
-  if (winRate >= WIN_RATE.THRESHOLD.AVERAGE) return WIN_RATE.COLOR.AVERAGE
-  return WIN_RATE.COLOR.POOR
-}
-
 const Podium = ({ players }: PodiumProps) => {
   return (
-    <div className="flex items-end justify-center gap-3 sm:gap-4 mb-8">
+    <div className="flex items-end justify-center gap-4 sm:gap-6 mb-8">
       {PODIUM_CONFIG.map(config => {
         const player = players[config.index]
         if (!player) return null
@@ -56,7 +50,7 @@ const Podium = ({ players }: PodiumProps) => {
           <div
             key={player.player_name}
             className={cn(
-              'relative rounded-xl overflow-hidden border-2 flex-1 max-w-[200px]',
+              'relative rounded-xl overflow-hidden border-2 flex-1 max-w-[280px]',
               'transition-all duration-300 hover:scale-105',
               config.borderColor,
               `shadow-lg ${config.glowColor}`
@@ -78,8 +72,8 @@ const Podium = ({ players }: PodiumProps) => {
 
             <div className="relative h-full flex flex-col justify-end p-3 sm:p-4">
               <div className="flex items-center gap-1 mb-1">
-                {config.rank === 1 && <Trophy className="h-5 w-5 text-gold" />}
-                <span className={cn('text-sm font-bold', config.rankColor)}>
+                {config.rank === 1 && <Trophy className="h-8 w-8 text-gold" />}
+                <span className={cn('text-3xl font-black', config.rankColor)}>
                   {config.label}
                 </span>
               </div>
@@ -92,15 +86,12 @@ const Podium = ({ players }: PodiumProps) => {
                 <span className="text-white/80 font-semibold">
                   {player.points} pts
                 </span>
-                <span className="text-white/60">
-                  {player.wins}-{player.draws}-{player.losses}
-                </span>
-                <span
-                  className={cn(
-                    'font-semibold',
-                    getWinRateColor(player.win_rate)
-                  )}
-                >
+                <div className="flex gap-2 text-white/60">
+                  <span>W: {player.wins}</span>
+                  <span>D: {player.draws}</span>
+                  <span>L: {player.losses}</span>
+                </div>
+                <span className="font-semibold text-amber-400">
                   {player.win_rate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
                 </span>
               </div>

@@ -73,9 +73,9 @@ export const RANKING = {
   FIRST_PLACE_INDEX: 0,
   PODIUM_SIZE: 3,
   PODIUM_HEIGHT: {
-    FIRST: 280,
-    SECOND: 240,
-    THIRD: 200,
+    FIRST: 360,
+    SECOND: 300,
+    THIRD: 260,
   },
 } as const
 
