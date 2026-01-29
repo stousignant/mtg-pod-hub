@@ -11,6 +11,7 @@ import Podium from './Podium'
 import PlayerCard from './PlayerCard'
 import type { PodLeaderboardEntry } from '@/data/mockData'
 import { UI, RANKING } from '@/constants/config'
+import { formatPlayerCount } from '@/lib/utils'
 
 interface LeaderboardProps {
   data: PodLeaderboardEntry[]
@@ -55,7 +56,7 @@ const Leaderboard = ({
         </CardTitle>
         <CardDescription>
           {selectedPod}
-          {playerCount ? ` (${playerCount})` : ''}
+          {playerCount ? ` (${formatPlayerCount(playerCount)})` : ''}
         </CardDescription>
       </CardHeader>
       <CardContent>

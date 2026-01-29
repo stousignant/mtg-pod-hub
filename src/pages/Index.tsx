@@ -2,6 +2,10 @@ import { useState, useMemo } from 'react'
 import Header from '@/components/Header'
 import Leaderboard from '@/components/Leaderboard'
 import PodFilter from '@/components/PodFilter'
+import {
+  PlayerCountFilter,
+  ALL_PLAYER_COUNTS,
+} from '@/components/PlayerCountFilter'
 import { useLeaderboard, usePodNames } from '@/hooks/useLeaderboard'
 import { useGameHistory } from '@/hooks/useGameHistory'
 import { POD_FILTER } from '@/constants/config'
@@ -9,6 +13,8 @@ import { POD_FILTER } from '@/constants/config'
 const Index = () => {
   const { data: pods = [], isLoading: podsLoading } = usePodNames()
   const [selectedPod, setSelectedPod] = useState<string>(POD_FILTER.ALL_PODS)
+  const [selectedPlayerCount, setSelectedPlayerCount] =
+    useState<string>(ALL_PLAYER_COUNTS)
 
   const { data: leaderboardData = [], isLoading: leaderboardLoading } =
     useLeaderboard(
@@ -42,12 +48,21 @@ const Index = () => {
       groups[entry.pod_name].push(entry)
     }
 
-    return Object.entries(groups).sort(([podA], [podB]) => {
+    let entries = Object.entries(groups).sort(([podA], [podB]) => {
       const gamesA = totalGamesByPod[podA] || 0
       const gamesB = totalGamesByPod[podB] || 0
       return gamesB - gamesA
     })
-  }, [leaderboardData, totalGamesByPod])
+
+    if (selectedPlayerCount !== ALL_PLAYER_COUNTS) {
+      const targetCount = parseInt(selectedPlayerCount, 10)
+      entries = entries.filter(([podName]) => {
+        return podPlayerCounts[podName] === targetCount
+      })
+    }
+
+    return entries
+  }, [leaderboardData, totalGamesByPod, selectedPlayerCount, podPlayerCounts])
 
   const isAllPods = selectedPod === POD_FILTER.ALL_PODS
   const isLoading = leaderboardLoading || podsLoading
@@ -56,8 +71,13 @@ const Index = () => {
     return pods.map(pod => ({
       name: pod,
       playerCount: podPlayerCounts[pod] || 0,
+      gamesPlayed: totalGamesByPod[pod] || 0,
     }))
-  }, [pods, podPlayerCounts])
+  }, [pods, podPlayerCounts, totalGamesByPod])
+
+  const availablePlayerCounts = useMemo(() => {
+    return Object.values(podPlayerCounts)
+  }, [podPlayerCounts])
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,13 +90,21 @@ const Index = () => {
           <p className="text-muted-foreground mb-6">
             Track your league performance and rankings
           </p>
-          <PodFilter
-            pods={podFilterOptions}
-            selectedPod={selectedPod}
-            onPodChange={setSelectedPod}
-            isLoading={podsLoading}
-            showAllPods={true}
-          />
+          <div className="flex flex-col sm:flex-row gap-4">
+            <PodFilter
+              pods={podFilterOptions}
+              selectedPod={selectedPod}
+              onPodChange={setSelectedPod}
+              isLoading={podsLoading}
+              showAllPods={true}
+            />
+            <PlayerCountFilter
+              playerCounts={availablePlayerCounts}
+              selectedCount={selectedPlayerCount}
+              onCountChange={setSelectedPlayerCount}
+              isLoading={podsLoading}
+            />
+          </div>
         </div>
 
         {isAllPods ? (

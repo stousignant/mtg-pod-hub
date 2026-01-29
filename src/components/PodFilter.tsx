@@ -8,10 +8,12 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { Filter } from 'lucide-react'
 import { POD_FILTER } from '@/constants/config'
+import { formatPlayerCount } from '@/lib/utils'
 
 export interface PodOption {
   name: string
   playerCount: number
+  gamesPlayed?: number
 }
 
 interface PodFilterProps {
@@ -40,9 +42,13 @@ const PodFilter = ({
     )
   }
 
-  const normalizedPods: PodOption[] = pods.map(pod =>
-    typeof pod === 'string' ? { name: pod, playerCount: 0 } : pod
-  )
+  const normalizedPods: PodOption[] = pods
+    .map(pod =>
+      typeof pod === 'string'
+        ? { name: pod, playerCount: 0, gamesPlayed: 0 }
+        : pod
+    )
+    .sort((a, b) => (b.gamesPlayed || 0) - (a.gamesPlayed || 0))
 
   const hasAllPodsEntry =
     allPodsValue && normalizedPods.some(p => p.name === allPodsValue)
@@ -68,7 +74,7 @@ const PodFilter = ({
             const label = isAllPodsItem
               ? 'All Pods'
               : pod.playerCount > 0
-                ? `${pod.name} (${pod.playerCount})`
+                ? `${pod.name} (${formatPlayerCount(pod.playerCount)})`
                 : pod.name
 
             return (
