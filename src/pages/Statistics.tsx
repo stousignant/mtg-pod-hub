@@ -2,11 +2,12 @@ import { useState, useMemo } from 'react'
 import Header from '@/components/Header'
 import DeckStatsTable from '@/components/DeckStatsTable'
 import GameTimeline from '@/components/GameTimeline'
+import OverviewStats from '@/components/OverviewStats'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePodNames } from '@/hooks/useLeaderboard'
 import { useDeckStats } from '@/hooks/useDeckStats'
 import { useGameHistory } from '@/hooks/useGameHistory'
-import { Clock, Layers } from 'lucide-react'
+import { BarChart3, Clock, Layers } from 'lucide-react'
 
 const ALL_PLAYERS_VALUE = '__all__'
 const ALL_PODS_VALUE = '__all__'
@@ -52,8 +53,15 @@ const Statistics = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="game-history" className="space-y-6">
+        <Tabs defaultValue="overview" className="space-y-6">
           <TabsList className="bg-muted/50 border border-border">
+            <TabsTrigger
+              value="overview"
+              className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+            >
+              <BarChart3 className="h-4 w-4" />
+              <span className="inline">Overview</span>
+            </TabsTrigger>
             <TabsTrigger
               value="game-history"
               className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
@@ -69,6 +77,13 @@ const Statistics = () => {
               <span className="inline">Deck Stats</span>
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="overview">
+            <OverviewStats
+              data={gameHistoryData}
+              isLoading={gameHistoryLoading}
+            />
+          </TabsContent>
 
           <TabsContent value="game-history">
             <GameTimeline
