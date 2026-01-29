@@ -9,21 +9,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { Filter } from 'lucide-react'
 import { POD_FILTER } from '@/constants/config'
 import { formatPlayerCount } from '@/lib/utils'
+import type { PodFilterConfig, PodOption } from '@/types/leaderboard'
 
-export interface PodOption {
-  name: string
-  playerCount: number
-  gamesPlayed?: number
-}
-
-interface PodFilterProps {
-  pods: (string | PodOption)[]
-  selectedPod: string
-  onPodChange: (pod: string) => void
-  isLoading: boolean
-  allPodsValue?: string
-  showAllPods?: boolean
-}
+type PodFilterProps = PodFilterConfig
 
 const PodFilter = ({
   pods,

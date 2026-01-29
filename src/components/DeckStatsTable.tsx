@@ -14,37 +14,24 @@ import { Label } from '@/components/ui/label'
 import PlayerFilter from './PlayerFilter'
 import PodFilter from './PodFilter'
 import { UI, WIN_RATE, RANKING } from '@/constants/config'
+import type { PlayerFilterConfig, PodFilterConfig } from '@/types/leaderboard'
 
 interface DeckStatsTableProps {
   data: DeckStatsEntry[]
   isLoading: boolean
-  players: string[]
-  selectedPlayer: string
-  onPlayerChange: (player: string) => void
-  allPlayersValue: string
+  playerFilter: PlayerFilterConfig
+  podFilter: Omit<PodFilterConfig, 'showAllPods'>
   hideLowPlayDecks: boolean
   onHideLowPlayDecksChange: (value: boolean) => void
-  pods: string[]
-  selectedPod: string
-  onPodChange: (pod: string) => void
-  allPodsValue: string
-  podsLoading: boolean
 }
 
 const DeckStatsTable = ({
   data,
   isLoading,
-  players,
-  selectedPlayer,
-  onPlayerChange,
-  allPlayersValue,
+  playerFilter,
+  podFilter,
   hideLowPlayDecks,
   onHideLowPlayDecksChange,
-  pods,
-  selectedPod,
-  onPodChange,
-  allPodsValue,
-  podsLoading,
 }: DeckStatsTableProps) => {
   if (isLoading) {
     return (
@@ -89,17 +76,17 @@ const DeckStatsTable = ({
             </Label>
           </div>
           <PodFilter
-            pods={[allPodsValue, ...pods]}
-            selectedPod={selectedPod}
-            onPodChange={onPodChange}
-            isLoading={podsLoading}
-            allPodsValue={allPodsValue}
+            pods={[podFilter.allPodsValue, ...podFilter.pods] as string[]}
+            selectedPod={podFilter.selected}
+            onPodChange={podFilter.onChange}
+            isLoading={podFilter.isLoading}
+            allPodsValue={podFilter.allPodsValue}
           />
           <PlayerFilter
-            players={players}
-            selectedPlayer={selectedPlayer}
-            onPlayerChange={onPlayerChange}
-            allPlayersValue={allPlayersValue}
+            players={playerFilter.players}
+            selectedPlayer={playerFilter.selected}
+            onPlayerChange={playerFilter.onChange}
+            allPlayersValue={playerFilter.allPlayersValue}
           />
         </div>
       </CardHeader>

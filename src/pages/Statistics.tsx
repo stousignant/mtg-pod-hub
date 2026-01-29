@@ -7,9 +7,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { usePodNames } from '@/hooks/useLeaderboard'
 import { useDeckStats } from '@/hooks/useDeckStats'
 import { useGameHistory } from '@/hooks/useGameHistory'
+import { useDeckStatsByPod } from '@/hooks/useDeckStatsByPod'
 import WinRateTrendChart from '@/components/WinRateTrendChart'
 import { BarChart3, Clock, Layers, TrendingUp } from 'lucide-react'
-import { OUTCOME } from '@/constants/config'
 
 const ALL_PLAYERS_VALUE = '__all__'
 const ALL_PODS_VALUE = '__all__'
@@ -32,67 +32,20 @@ const Statistics = () => {
   const { data: gameHistoryData = [], isLoading: gameHistoryLoading } =
     useGameHistory()
 
+  const deckStatsByPod = useDeckStatsByPod({
+    gameHistory: gameHistoryData,
+    selectedPod: selectedDeckStatsPod,
+    allPodsValue: ALL_PODS_VALUE,
+  })
+
   const ownerNames = useMemo(() => {
-    const unique = [...new Set(deckStatsData.map(d => d.owner_name))]
+    const baseData = deckStatsByPod || deckStatsData
+    const unique = [...new Set(baseData.map(d => d.owner_name))]
     return unique.sort()
-  }, [deckStatsData])
-
-  const computeDeckStatsFromGameHistory = useMemo(() => {
-    if (selectedDeckStatsPod === ALL_PODS_VALUE) {
-      return null
-    }
-
-    const filteredHistory = gameHistoryData.filter(
-      entry => entry.pod_name === selectedDeckStatsPod
-    )
-
-    const deckMap = new Map<
-      string,
-      {
-        commander_name: string
-        commander_image_url: string | null
-        owner_name: string
-        games: number
-        wins: number
-      }
-    >()
-
-    for (const entry of filteredHistory) {
-      if (!deckMap.has(entry.deck_name)) {
-        deckMap.set(entry.deck_name, {
-          commander_name: entry.commander_name,
-          commander_image_url: entry.commander_image_url,
-          owner_name: entry.player_name,
-          games: 0,
-          wins: 0,
-        })
-      }
-
-      const deckStats = deckMap.get(entry.deck_name)!
-      deckStats.games++
-      if (entry.outcome === OUTCOME.WIN) {
-        deckStats.wins++
-      }
-    }
-
-    return Array.from(deckMap.entries())
-      .map(([deckName, stats]) => ({
-        deck_name: deckName,
-        commander_name: stats.commander_name,
-        commander_image_url: stats.commander_image_url,
-        owner_name: stats.owner_name,
-        games_played: stats.games,
-        wins: stats.wins,
-        win_rate: stats.games > 0 ? (stats.wins / stats.games) * 100 : 0,
-      }))
-      .sort((a, b) => b.win_rate - a.win_rate)
-  }, [gameHistoryData, selectedDeckStatsPod])
+  }, [deckStatsData, deckStatsByPod])
 
   const filteredDeckStats = useMemo(() => {
-    let filtered =
-      selectedDeckStatsPod !== ALL_PODS_VALUE && computeDeckStatsFromGameHistory
-        ? computeDeckStatsFromGameHistory
-        : deckStatsData
+    let filtered = deckStatsByPod || deckStatsData
 
     if (selectedPlayer !== ALL_PLAYERS_VALUE) {
       filtered = filtered.filter(d => d.owner_name === selectedPlayer)
@@ -101,13 +54,7 @@ const Statistics = () => {
       filtered = filtered.filter(d => d.games_played > 1)
     }
     return filtered
-  }, [
-    deckStatsData,
-    computeDeckStatsFromGameHistory,
-    selectedPlayer,
-    selectedDeckStatsPod,
-    hideLowPlayDecks,
-  ])
+  }, [deckStatsData, deckStatsByPod, selectedPlayer, hideLowPlayDecks])
 
   return (
     <div className="min-h-screen bg-background">
@@ -180,17 +127,22 @@ const Statistics = () => {
             <DeckStatsTable
               data={filteredDeckStats}
               isLoading={deckStatsLoading}
-              players={ownerNames}
-              selectedPlayer={selectedPlayer}
-              onPlayerChange={setSelectedPlayer}
-              allPlayersValue={ALL_PLAYERS_VALUE}
+              playerFilter={{
+                players: ownerNames,
+                selected: selectedPlayer,
+                onChange: setSelectedPlayer,
+                allPlayersValue: ALL_PLAYERS_VALUE,
+                isLoading: false,
+              }}
+              podFilter={{
+                pods: pods,
+                selected: selectedDeckStatsPod,
+                onChange: setSelectedDeckStatsPod,
+                allPodsValue: ALL_PODS_VALUE,
+                isLoading: podsLoading,
+              }}
               hideLowPlayDecks={hideLowPlayDecks}
               onHideLowPlayDecksChange={setHideLowPlayDecks}
-              pods={pods}
-              selectedPod={selectedDeckStatsPod}
-              onPodChange={setSelectedDeckStatsPod}
-              allPodsValue={ALL_PODS_VALUE}
-              podsLoading={podsLoading}
             />
           </TabsContent>
 
