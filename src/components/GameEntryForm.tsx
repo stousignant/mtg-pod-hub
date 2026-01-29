@@ -112,7 +112,7 @@ export const GameEntryForm = () => {
                       </FormControl>
                       <SelectContent>
                         {pods.map(pod => (
-                          <SelectItem key={pod.id} value={pod.id}>
+                          <SelectItem key={pod.id} value={String(pod.id)}>
                             {pod.name}
                           </SelectItem>
                         ))}
@@ -130,7 +130,12 @@ export const GameEntryForm = () => {
                   <FormItem>
                     <FormLabel>Date</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} disabled={isLoading} />
+                      <Input
+                        type="date"
+                        {...field}
+                        disabled={isLoading}
+                        className="[&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-70"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -236,7 +241,7 @@ const PlayerResultFields = ({
                 </FormControl>
                 <SelectContent>
                   {players.map(player => (
-                    <SelectItem key={player.id} value={player.id}>
+                    <SelectItem key={player.id} value={String(player.id)}>
                       {player.name}
                     </SelectItem>
                   ))}
@@ -269,7 +274,7 @@ const PlayerResultFields = ({
                 </FormControl>
                 <SelectContent>
                   {decks.map(deck => (
-                    <SelectItem key={deck.id} value={deck.id}>
+                    <SelectItem key={deck.id} value={String(deck.id)}>
                       {deck.name} ({deck.commander_name})
                     </SelectItem>
                   ))}
