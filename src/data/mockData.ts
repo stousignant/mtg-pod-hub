@@ -23,6 +23,7 @@ export interface GameHistoryEntry {
   deck_name: string
   commander_name: string
   commander_image_url: string | null
+  notes: string | null
 }
 
 export interface DeckStatsEntry {

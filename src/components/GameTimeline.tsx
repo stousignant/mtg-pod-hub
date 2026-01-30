@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { Clock } from 'lucide-react'
+import { Clock, StickyNote } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import PlaneswalkerAvatar from './PlaneswalkerAvatar'
 import PodFilter from './PodFilter'
@@ -29,6 +29,7 @@ interface GroupedGame {
   playedAt: string
   podName: string
   results: GameHistoryEntry[]
+  notes: string | null
 }
 
 const ALL_PODS_VALUE = '__all__'
@@ -95,6 +96,7 @@ const GameTimeline = ({
           playedAt: entry.played_at,
           podName: entry.pod_name,
           results: [],
+          notes: entry.notes,
         })
       }
       gameMap.get(entry.game_id)!.results.push(entry)
@@ -223,6 +225,16 @@ const GameTimeline = ({
                             </div>
                           ))}
                       </div>
+                      {game.notes && (
+                        <div className="px-4 py-2 border-t border-border/30">
+                          <div className="flex items-start gap-2">
+                            <StickyNote className="h-3.5 w-3.5 text-muted-foreground/60 mt-0.5 flex-shrink-0" />
+                            <p className="text-xs text-muted-foreground italic">
+                              {game.notes}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
