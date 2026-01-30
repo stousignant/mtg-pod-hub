@@ -8,15 +8,18 @@ import { usePodNames } from '@/hooks/useLeaderboard'
 import { useDeckStats } from '@/hooks/useDeckStats'
 import { useGameHistory } from '@/hooks/useGameHistory'
 import { useDeckStatsByPod } from '@/hooks/useDeckStatsByPod'
+import { useDeckStreaks } from '@/hooks/useDeckStreaks'
 import WinRateTrendChart from '@/components/WinRateTrendChart'
 import { BarChart3, Clock, Layers, TrendingUp } from 'lucide-react'
 
 const ALL_PLAYERS_VALUE = '__all__'
 const ALL_PODS_VALUE = '__all__'
+const ALL_DECKS_VALUE = '__all__'
 
 const Statistics = () => {
   const { data: pods = [], isLoading: podsLoading } = usePodNames()
   const [selectedPod, setSelectedPod] = useState<string>(ALL_PODS_VALUE)
+  const [selectedDeck, setSelectedDeck] = useState<string>(ALL_DECKS_VALUE)
   const [selectedOverviewPod, setSelectedOverviewPod] =
     useState<string>(ALL_PODS_VALUE)
   const [selectedTrendPod, setSelectedTrendPod] =
@@ -32,11 +35,18 @@ const Statistics = () => {
   const { data: gameHistoryData = [], isLoading: gameHistoryLoading } =
     useGameHistory()
 
+  const deckStreaks = useDeckStreaks(gameHistoryData)
+
   const deckStatsByPod = useDeckStatsByPod({
     gameHistory: gameHistoryData,
     selectedPod: selectedDeckStatsPod,
     allPodsValue: ALL_PODS_VALUE,
   })
+
+  const deckNames = useMemo(() => {
+    const unique = [...new Set(gameHistoryData.map(d => d.deck_name))]
+    return unique.sort()
+  }, [gameHistoryData])
 
   const ownerNames = useMemo(() => {
     const baseData = deckStatsByPod || deckStatsData
@@ -120,12 +130,17 @@ const Statistics = () => {
               selectedPod={selectedPod}
               onPodChange={setSelectedPod}
               podsLoading={podsLoading}
+              decks={deckNames}
+              selectedDeck={selectedDeck}
+              onDeckChange={setSelectedDeck}
+              decksLoading={gameHistoryLoading}
             />
           </TabsContent>
 
           <TabsContent value="deck-stats">
             <DeckStatsTable
               data={filteredDeckStats}
+              streaks={deckStreaks}
               isLoading={deckStatsLoading}
               playerFilter={{
                 players: ownerNames,

@@ -8,10 +8,11 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
-import { Clock } from 'lucide-react'
+import { Clock, StickyNote } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import PlaneswalkerAvatar from './PlaneswalkerAvatar'
 import PodFilter from './PodFilter'
+import DeckFilter from './DeckFilter'
 import type { GameHistoryEntry } from '@/data/mockData'
 import { OUTCOME, UI } from '@/constants/config'
 
@@ -22,6 +23,10 @@ interface GameTimelineProps {
   selectedPod: string
   onPodChange: (pod: string) => void
   podsLoading: boolean
+  decks: string[]
+  selectedDeck: string
+  onDeckChange: (deck: string) => void
+  decksLoading: boolean
 }
 
 interface GroupedGame {
@@ -29,9 +34,11 @@ interface GroupedGame {
   playedAt: string
   podName: string
   results: GameHistoryEntry[]
+  notes: string | null
 }
 
 const ALL_PODS_VALUE = '__all__'
+const ALL_DECKS_VALUE = '__all__'
 
 const formatDate = (dateString: string) => {
   const date = new Date(dateString + 'T00:00:00')
@@ -43,11 +50,19 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const OutcomeBadge = ({ outcome }: { outcome: string }) => {
+const OutcomeBadge = ({
+  outcome,
+  unsatisfying,
+}: {
+  outcome: string
+  unsatisfying?: boolean
+}) => {
   const config = {
     [OUTCOME.WIN]: {
       label: 'W',
-      className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      className: unsatisfying
+        ? 'bg-emerald-500/10 text-emerald-400/60 border-emerald-500/20'
+        : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     },
     [OUTCOME.LOSS]: {
       label: 'L',
@@ -67,6 +82,7 @@ const OutcomeBadge = ({ outcome }: { outcome: string }) => {
       className={cn('text-xs font-bold px-2', className)}
     >
       {label}
+      {unsatisfying && outcome === OUTCOME.WIN ? '*' : ''}
     </Badge>
   )
 }
@@ -78,14 +94,28 @@ const GameTimeline = ({
   selectedPod,
   onPodChange,
   podsLoading,
+  decks,
+  selectedDeck,
+  onDeckChange,
+  decksLoading,
 }: GameTimelineProps) => {
   const allPods = useMemo(() => [ALL_PODS_VALUE, ...pods], [pods])
 
   const groupedGames = useMemo(() => {
-    const filtered =
-      selectedPod === ALL_PODS_VALUE
-        ? data
-        : data.filter(entry => entry.pod_name === selectedPod)
+    let filtered = data
+
+    if (selectedPod !== ALL_PODS_VALUE) {
+      filtered = filtered.filter(entry => entry.pod_name === selectedPod)
+    }
+
+    if (selectedDeck !== ALL_DECKS_VALUE) {
+      const gamesWithDeck = new Set(
+        filtered
+          .filter(entry => entry.deck_name === selectedDeck)
+          .map(entry => entry.game_id)
+      )
+      filtered = filtered.filter(entry => gamesWithDeck.has(entry.game_id))
+    }
 
     const gameMap = new Map<number, GroupedGame>()
     for (const entry of filtered) {
@@ -95,6 +125,7 @@ const GameTimeline = ({
           playedAt: entry.played_at,
           podName: entry.pod_name,
           results: [],
+          notes: entry.notes,
         })
       }
       gameMap.get(entry.game_id)!.results.push(entry)
@@ -103,7 +134,7 @@ const GameTimeline = ({
     return [...gameMap.values()].sort(
       (a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime()
     )
-  }, [data, selectedPod])
+  }, [data, selectedPod, selectedDeck])
 
   const gamesByDate = useMemo(() => {
     const dateMap = new Map<string, GroupedGame[]>()
@@ -137,21 +168,32 @@ const GameTimeline = ({
 
   return (
     <Card className="glow-purple border-primary/20">
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-primary" />
-            Game History
-          </CardTitle>
-          <CardDescription>Timeline of all games played</CardDescription>
+      <CardHeader className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5 text-primary" />
+              Game History
+            </CardTitle>
+            <CardDescription>Timeline of all games played</CardDescription>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <PodFilter
+              pods={allPods}
+              selectedPod={selectedPod}
+              onPodChange={onPodChange}
+              isLoading={podsLoading}
+              allPodsValue={ALL_PODS_VALUE}
+            />
+            <DeckFilter
+              decks={decks}
+              selectedDeck={selectedDeck}
+              onDeckChange={onDeckChange}
+              isLoading={decksLoading}
+              allDecksValue={ALL_DECKS_VALUE}
+            />
+          </div>
         </div>
-        <PodFilter
-          pods={allPods}
-          selectedPod={selectedPod}
-          onPodChange={onPodChange}
-          isLoading={podsLoading}
-          allPodsValue={ALL_PODS_VALUE}
-        />
       </CardHeader>
       <CardContent>
         {gamesByDate.length === 0 ? (
@@ -182,6 +224,15 @@ const GameTimeline = ({
                       <div className="px-4 py-2 flex flex-wrap gap-2">
                         {game.results
                           .sort((a, b) => {
+                            if (selectedDeck !== ALL_DECKS_VALUE) {
+                              const aIsFilteredDeck =
+                                a.deck_name === selectedDeck
+                              const bIsFilteredDeck =
+                                b.deck_name === selectedDeck
+                              if (aIsFilteredDeck && !bIsFilteredDeck) return -1
+                              if (!aIsFilteredDeck && bIsFilteredDeck) return 1
+                            }
+
                             const order = {
                               [OUTCOME.WIN]: 0,
                               [OUTCOME.DRAW]: 1,
@@ -219,10 +270,23 @@ const GameTimeline = ({
                               <span className="text-xs text-muted-foreground hidden sm:inline">
                                 {result.deck_name}
                               </span>
-                              <OutcomeBadge outcome={result.outcome} />
+                              <OutcomeBadge
+                                outcome={result.outcome}
+                                unsatisfying={result.unsatisfying}
+                              />
                             </div>
                           ))}
                       </div>
+                      {game.notes && (
+                        <div className="px-4 py-2 border-t border-border/30">
+                          <div className="flex items-start gap-2">
+                            <StickyNote className="h-3.5 w-3.5 text-muted-foreground/60 mt-0.5 flex-shrink-0" />
+                            <p className="text-xs text-muted-foreground italic">
+                              {game.notes}
+                            </p>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

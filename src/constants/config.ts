@@ -52,6 +52,8 @@ export const CHART = {
     Y_DOMAIN_MIN: 0,
     Y_DOMAIN_MAX: 100,
     Y_AUTO_PADDING: 5,
+    Y_PERCENTILE_MIN: 5,
+    Y_PERCENTILE_MAX: 95,
   },
   TOOLTIP: {
     BORDER_RADIUS: 8,

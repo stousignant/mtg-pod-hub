@@ -18,11 +18,14 @@ export interface GameHistoryEntry {
   played_at: string
   pod_name: string
   outcome: string
+  unsatisfying: boolean
   player_name: string
   player_avatar_url: string | null
   deck_name: string
+  deck_id: string
   commander_name: string
   commander_image_url: string | null
+  notes: string | null
 }
 
 export interface DeckStatsEntry {
@@ -51,6 +54,7 @@ export interface Deck {
   name: string
   commander_name: string
   owner_id: string
+  commander_image_url: string | null
 }
 
 export const mockPodLeaderboard: PodLeaderboardEntry[] = [
@@ -318,6 +322,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Eldrazi Menace',
     commander_name: 'Kozilek, the Great Distortion',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 1,
@@ -329,6 +336,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Dimir Control',
     commander_name: 'Scarab God',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 1,
@@ -340,6 +350,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Artifact Combo',
     commander_name: 'Urza, Lord High Artificer',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 1,
@@ -351,6 +364,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Krenko Goblins',
     commander_name: 'Krenko, Mob Boss',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 2,
@@ -362,6 +378,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Selesnya Tokens',
     commander_name: 'Rhys the Redeemed',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 2,
@@ -373,6 +392,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Burn Everything',
     commander_name: 'Purphoros, God of the Forge',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 2,
@@ -384,6 +406,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Vampire Aristocrats',
     commander_name: 'Edgar Markov',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 3,
@@ -395,6 +420,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Dimir Control',
     commander_name: 'Scarab God',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 3,
@@ -407,6 +435,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Grixis Reanimator',
     commander_name: 'Sedris, the Traitor King',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 3,
@@ -418,6 +449,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Spirit Tribal',
     commander_name: 'Ugin, the Spirit Dragon',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 3,
@@ -429,6 +463,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Mono Blue Tempo',
     commander_name: 'Baral, Chief of Compliance',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 4,
@@ -440,6 +477,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Artifact Combo',
     commander_name: 'Urza, Lord High Artificer',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 4,
@@ -452,6 +492,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Eldrazi Menace',
     commander_name: 'Kozilek, the Great Distortion',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
   {
     game_id: 4,
@@ -464,6 +507,9 @@ export const mockGameHistory: GameHistoryEntry[] = [
     deck_name: 'Eldrazi Menace',
     commander_name: 'Kozilek, the Great Distortion',
     commander_image_url: null,
+    unsatisfying: false,
+    deck_id: '1',
+    notes: null,
   },
 ]
 
@@ -539,59 +585,69 @@ export const mockDecks: Deck[] = [
     name: 'Dimir Control',
     commander_name: 'Scarab God',
     owner_id: '1',
+    commander_image_url: null,
   },
   {
     id: '2',
     name: 'Grixis Reanimator',
     commander_name: 'Sedris, the Traitor King',
     owner_id: '2',
+    commander_image_url: null,
   },
   {
     id: '3',
     name: 'Mono Blue Tempo',
     commander_name: 'Baral, Chief of Compliance',
     owner_id: '3',
+    commander_image_url: null,
   },
   {
     id: '4',
     name: 'Krenko Goblins',
     commander_name: 'Krenko, Mob Boss',
     owner_id: '4',
+    commander_image_url: null,
   },
   {
     id: '5',
     name: 'Selesnya Tokens',
     commander_name: 'Rhys the Redeemed',
     owner_id: '5',
+    commander_image_url: null,
   },
   {
     id: '6',
     name: 'Burn Everything',
     commander_name: 'Purphoros, God of the Forge',
     owner_id: '6',
+    commander_image_url: null,
   },
   {
     id: '7',
     name: 'Eldrazi Menace',
     commander_name: 'Kozilek, the Great Distortion',
     owner_id: '9',
+    commander_image_url: null,
   },
   {
     id: '8',
     name: 'Vampire Aristocrats',
     commander_name: 'Edgar Markov',
     owner_id: '8',
+    commander_image_url: null,
   },
   {
     id: '9',
     name: 'Artifact Combo',
     commander_name: 'Urza, Lord High Artificer',
     owner_id: '10',
+    commander_image_url: null,
   },
   {
     id: '10',
     name: 'Spirit Tribal',
     commander_name: 'Ugin, the Spirit Dragon',
     owner_id: '11',
+    commander_image_url: null,
   },
 ]

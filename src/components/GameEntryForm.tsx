@@ -17,7 +17,9 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
   Form,
   FormControl,
@@ -38,6 +40,7 @@ const emptyResult = () => ({
   player_id: '',
   deck_id: '',
   outcome: '' as const,
+  unsatisfying: false,
 })
 
 export const GameEntryForm = () => {
@@ -49,6 +52,7 @@ export const GameEntryForm = () => {
     defaultValues: {
       pod_id: '',
       game_date: new Date().toISOString().split('T')[0],
+      notes: '',
       results: Array.from(
         { length: GAME_ENTRY.DEFAULT_PLAYER_COUNT },
         emptyResult
@@ -75,6 +79,7 @@ export const GameEntryForm = () => {
       player_id: String(player.id),
       deck_id: '',
       outcome: '' as const,
+      unsatisfying: false,
     }))
 
     replace(results)
@@ -88,8 +93,10 @@ export const GameEntryForm = () => {
       const resetResults = currentResults.map(result => ({
         ...result,
         outcome: '' as const,
+        unsatisfying: false,
       }))
       form.setValue('results', resetResults)
+      form.setValue('notes', '')
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Failed to record game'
@@ -105,8 +112,11 @@ export const GameEntryForm = () => {
       results.forEach((_, index) => {
         if (index !== changedIndex) {
           form.setValue(`results.${index}.outcome`, OUTCOME.LOSS)
+          form.setValue(`results.${index}.unsatisfying`, false)
         }
       })
+    } else {
+      form.setValue(`results.${changedIndex}.unsatisfying`, false)
     }
   }
 
@@ -170,6 +180,25 @@ export const GameEntryForm = () => {
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Add any notes about this game..."
+                      {...field}
+                      disabled={isLoading}
+                      rows={2}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <Separator />
 
@@ -338,6 +367,29 @@ const PlayerResultFields = ({
           )}
         />
       </div>
+
+      {form.watch(`results.${index}.outcome`) === OUTCOME.WIN && (
+        <FormField
+          control={form.control}
+          name={`results.${index}.unsatisfying`}
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 mt-3">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                  disabled={isLoading}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel className="text-sm font-normal text-muted-foreground">
+                  Unsatisfying win (doesn't count for Trash Test)
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
+      )}
     </Card>
   )
 }

@@ -6,11 +6,13 @@ interface GameResult {
   player_id: string
   deck_id: string
   outcome: Outcome
+  unsatisfying: boolean
 }
 
 interface CreateGameInput {
   pod_id: string
   game_date: string
+  notes?: string
   results: GameResult[]
 }
 
@@ -36,6 +38,7 @@ export const useGameMutations = () => {
         .insert({
           pod_id: input.pod_id,
           played_at: input.game_date,
+          notes: input.notes || null,
           created_by: user.id,
         })
         .select()
@@ -50,6 +53,7 @@ export const useGameMutations = () => {
         player_id: result.player_id,
         deck_id: result.deck_id,
         outcome: result.outcome,
+        unsatisfying: result.unsatisfying,
       }))
 
       const { error: resultsError } = await supabase
@@ -66,6 +70,7 @@ export const useGameMutations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.POD_LEADERBOARD] })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DECK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GAME_HISTORY] })
     },
   })
 
