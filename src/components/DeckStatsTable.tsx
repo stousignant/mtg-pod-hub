@@ -6,10 +6,11 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Layers, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react'
+import { Layers } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { DeckStatsEntry } from '@/data/mockData'
 import type { DeckStreaks } from '@/lib/streakCalculations'
+import { StreakDisplay } from './StreakDisplay'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import PlayerFilter from './PlayerFilter'
@@ -173,50 +174,13 @@ const DeckStatsTable = ({
 
                   {/* Streaks */}
                   {deckStreak && (
-                    <div className="flex items-center gap-4 text-xs border-t border-border/30 pt-2">
-                      {/* Current Streak */}
-                      {deckStreak.currentStreakType && (
-                        <div
-                          className={cn(
-                            'flex items-center gap-1',
-                            hasTrashTestWarning && 'text-rose-400'
-                          )}
-                        >
-                          {hasTrashTestWarning && (
-                            <AlertTriangle className="h-3.5 w-3.5" />
-                          )}
-                          {deckStreak.currentStreakType === 'win' ? (
-                            <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
-                          ) : (
-                            <TrendingDown className="h-3.5 w-3.5" />
-                          )}
-                          <span className="text-muted-foreground">
-                            Current: {deckStreak.currentStreak}{' '}
-                            {deckStreak.currentStreakType === 'win' ? 'W' : 'L'}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Best Win Streak */}
-                      {deckStreak.bestWinStreak > 0 && (
-                        <div className="flex items-center gap-1">
-                          <TrendingUp className="h-3.5 w-3.5 text-emerald-400/60" />
-                          <span className="text-muted-foreground">
-                            Best: {deckStreak.bestWinStreak} W
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Worst Lose Streak */}
-                      {deckStreak.worstLoseStreak > 0 && (
-                        <div className="flex items-center gap-1">
-                          <TrendingDown className="h-3.5 w-3.5 text-rose-400/60" />
-                          <span className="text-muted-foreground">
-                            Worst: {deckStreak.worstLoseStreak} L
-                          </span>
-                        </div>
-                      )}
-                    </div>
+                    <StreakDisplay
+                      currentStreak={deckStreak.currentStreak}
+                      currentStreakType={deckStreak.currentStreakType}
+                      bestWinStreak={deckStreak.bestWinStreak}
+                      worstLoseStreak={deckStreak.worstLoseStreak}
+                      showTrashTestWarning={hasTrashTestWarning}
+                    />
                   )}
                 </div>
               </div>

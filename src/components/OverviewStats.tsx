@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { BarChart3, Gamepad2, Users, MapPin, Swords } from 'lucide-react'
 import type { GameHistoryEntry } from '@/data/mockData'
 import PodFilter from './PodFilter'
+import { StreakDisplay } from './StreakDisplay'
 import { UI, OUTCOME } from '@/constants/config'
 
 const ALL_PODS_VALUE = '__all__'
@@ -35,7 +36,8 @@ interface PlayerStats {
   favoriteDeckGames: number
   bestDeck: string | null
   bestDeckWinRate: number
-  currentStreak: string | null
+  currentStreak: number
+  currentStreakType: 'win' | 'loss' | null
   longestWinStreak: number
   longestLossStreak: number
 }
@@ -75,7 +77,13 @@ const computeLongestStreak = (
   let longest = 0
   let current = 0
   for (const entry of sorted) {
-    if (entry.outcome === targetOutcome) {
+    const isValidWin = entry.outcome === OUTCOME.WIN && !entry.unsatisfying
+    const matchesTarget =
+      targetOutcome === OUTCOME.WIN
+        ? isValidWin
+        : entry.outcome === targetOutcome
+
+    if (matchesTarget) {
       current++
       if (current > longest) longest = current
     } else {
@@ -109,7 +117,9 @@ const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
   return [...playerMap.entries()]
     .map(([playerName, { avatarUrl, entries }]) => {
       const gamesPlayed = entries.length
-      const wins = entries.filter(e => e.outcome === OUTCOME.WIN).length
+      const wins = entries.filter(
+        e => e.outcome === OUTCOME.WIN && !e.unsatisfying
+      ).length
       const draws = entries.filter(e => e.outcome === OUTCOME.DRAW).length
       const losses = entries.filter(e => e.outcome === OUTCOME.LOSS).length
       const winRate = gamesPlayed > 0 ? (wins / gamesPlayed) * 100 : 0
@@ -118,7 +128,7 @@ const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
       const deckWins = new Map<string, number>()
       for (const e of entries) {
         deckCounts.set(e.deck_name, (deckCounts.get(e.deck_name) ?? 0) + 1)
-        if (e.outcome === OUTCOME.WIN) {
+        if (e.outcome === OUTCOME.WIN && !e.unsatisfying) {
           deckWins.set(e.deck_name, (deckWins.get(e.deck_name) ?? 0) + 1)
         }
       }
@@ -143,26 +153,36 @@ const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
         (a, b) =>
           new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
       )
-      const streakOutcome = sortedByDate[0]?.outcome
-      let streakCount = 0
-      for (const e of sortedByDate) {
-        if (e.outcome === streakOutcome) {
-          streakCount++
-        } else {
-          break
+
+      let currentStreak = 0
+      let currentStreakType: 'win' | 'loss' | null = null
+
+      if (sortedByDate.length > 0) {
+        const firstEntry = sortedByDate[0]
+        const isFirstWin =
+          firstEntry.outcome === OUTCOME.WIN && !firstEntry.unsatisfying
+        const isFirstLoss = firstEntry.outcome === OUTCOME.LOSS
+
+        if (isFirstWin || isFirstLoss) {
+          currentStreakType = isFirstWin ? 'win' : 'loss'
+          currentStreak = 1
+
+          for (let i = 1; i < sortedByDate.length; i++) {
+            const entry = sortedByDate[i]
+            const isWin = entry.outcome === OUTCOME.WIN && !entry.unsatisfying
+            const isLoss = entry.outcome === OUTCOME.LOSS
+
+            if (
+              (currentStreakType === 'win' && isWin) ||
+              (currentStreakType === 'loss' && isLoss)
+            ) {
+              currentStreak++
+            } else {
+              break
+            }
+          }
         }
       }
-      const MIN_STREAK_TO_DISPLAY = 2
-      const streakAbbreviation =
-        streakOutcome === OUTCOME.WIN
-          ? 'W'
-          : streakOutcome === OUTCOME.LOSS
-            ? 'L'
-            : 'D'
-      const currentStreak =
-        streakCount >= MIN_STREAK_TO_DISPLAY
-          ? `${streakCount}${streakAbbreviation}`
-          : null
 
       const longestWinStreak = computeLongestStreak(entries, OUTCOME.WIN)
       const longestLossStreak = computeLongestStreak(entries, OUTCOME.LOSS)
@@ -180,6 +200,7 @@ const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
         bestDeck,
         bestDeckWinRate,
         currentStreak,
+        currentStreakType,
         longestWinStreak,
         longestLossStreak,
       }
@@ -368,28 +389,12 @@ const OverviewStats = ({
                       </div>
                     </div>
 
-                    {(player.longestWinStreak > 0 ||
-                      player.longestLossStreak > 0 ||
-                      player.currentStreak) && (
-                      <div className="flex items-center gap-3 flex-wrap text-xs">
-                        <span className="text-muted-foreground">Streaks:</span>
-                        {player.longestWinStreak > 0 && (
-                          <span className="text-emerald-400 font-mono bg-emerald-500/10 px-2 py-1 rounded">
-                            Best W: {player.longestWinStreak}
-                          </span>
-                        )}
-                        {player.longestLossStreak > 0 && (
-                          <span className="text-rose-400 font-mono bg-rose-500/10 px-2 py-1 rounded">
-                            Worst L: {player.longestLossStreak}
-                          </span>
-                        )}
-                        {player.currentStreak && (
-                          <span className="text-muted-foreground font-mono bg-muted/50 px-2 py-1 rounded">
-                            Current: {player.currentStreak}
-                          </span>
-                        )}
-                      </div>
-                    )}
+                    <StreakDisplay
+                      currentStreak={player.currentStreak}
+                      currentStreakType={player.currentStreakType}
+                      bestWinStreak={player.longestWinStreak}
+                      worstLoseStreak={player.longestLossStreak}
+                    />
                   </div>
                 </div>
               )
