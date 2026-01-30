@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Users } from 'lucide-react'
+import { PLAYER_COUNT_FILTER } from '@/constants/config'
 
 interface PlayerCountFilterProps {
   playerCounts: number[]
@@ -14,8 +15,6 @@ interface PlayerCountFilterProps {
   onCountChange: (count: string) => void
   isLoading: boolean
 }
-
-const ALL_PLAYER_COUNTS = '__all_player_counts__'
 
 const PlayerCountFilter = ({
   playerCounts,
@@ -43,7 +42,7 @@ const PlayerCountFilter = ({
         </SelectTrigger>
         <SelectContent className="bg-card border-border">
           <SelectItem
-            value={ALL_PLAYER_COUNTS}
+            value={PLAYER_COUNT_FILTER.ALL_PLAYER_COUNTS}
             className="focus:bg-primary/20 focus:text-foreground"
           >
             All Player Counts
@@ -63,4 +62,4 @@ const PlayerCountFilter = ({
   )
 }
 
-export { PlayerCountFilter, ALL_PLAYER_COUNTS }
+export default PlayerCountFilter

@@ -11,7 +11,7 @@ import Podium from './Podium'
 import PlayerCard from './PlayerCard'
 import type { PodLeaderboardEntry } from '@/data/mockData'
 import { UI, RANKING } from '@/constants/config'
-import { formatPlayerCount } from '@/lib/utils'
+import { formatPlayerCount, calculateOlympicRanks } from '@/lib/utils'
 
 interface LeaderboardProps {
   data: PodLeaderboardEntry[]
@@ -46,17 +46,7 @@ const Leaderboard = ({
     )
   }
 
-  // Calculate Olympic-style ranks (tied players get same rank, next rank skips)
-  const playersWithRanks: (PodLeaderboardEntry & { rank: number })[] = []
-  let currentRank = 1
-
-  for (let i = 0; i < data.length; i++) {
-    if (i > 0 && data[i].points !== data[i - 1].points) {
-      currentRank = i + 1
-    }
-    playersWithRanks.push({ ...data[i], rank: currentRank })
-  }
-
+  const playersWithRanks = calculateOlympicRanks(data)
   const podiumPlayers = playersWithRanks.slice(0, RANKING.PODIUM_SIZE)
   const remainingPlayers = playersWithRanks.slice(RANKING.PODIUM_SIZE)
 
