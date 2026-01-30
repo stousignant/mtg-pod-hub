@@ -12,6 +12,7 @@ export const gameResultSchema = z.object({
 export const gameFormSchema = z.object({
   pod_id: z.string().min(1, 'Pod is required'),
   game_date: z.string().min(1, 'Date is required'),
+  notes: z.string().optional(),
   results: z
     .array(gameResultSchema)
     .min(

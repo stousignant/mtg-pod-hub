@@ -17,6 +17,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import {
   Form,
@@ -49,6 +50,7 @@ export const GameEntryForm = () => {
     defaultValues: {
       pod_id: '',
       game_date: new Date().toISOString().split('T')[0],
+      notes: '',
       results: Array.from(
         { length: GAME_ENTRY.DEFAULT_PLAYER_COUNT },
         emptyResult
@@ -90,6 +92,7 @@ export const GameEntryForm = () => {
         outcome: '' as const,
       }))
       form.setValue('results', resetResults)
+      form.setValue('notes', '')
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : 'Failed to record game'
@@ -170,6 +173,25 @@ export const GameEntryForm = () => {
                 )}
               />
             </div>
+
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Add any notes about this game..."
+                      {...field}
+                      disabled={isLoading}
+                      rows={2}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <Separator />
 
