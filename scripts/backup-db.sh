@@ -68,9 +68,13 @@ delete_file() {
     -o /dev/null
 }
 
+echo "==> Resolving database host (IPv4)..."
+DB_HOST=$(getent ahostsv4 "db.${SUPABASE_PROJECT_REF}.supabase.co" | head -1 | awk '{print $1}')
+echo "Resolved to: ${DB_HOST}"
+
 echo "==> Dumping database (data only)..."
 PGPASSWORD="${SUPABASE_DB_PASSWORD}" pg_dump \
-  --host "db.${SUPABASE_PROJECT_REF}.supabase.co" \
+  --host "${DB_HOST}" \
   --port 5432 \
   --username postgres \
   --dbname postgres \
