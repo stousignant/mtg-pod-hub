@@ -69,7 +69,15 @@ delete_file() {
 }
 
 echo "==> Dumping database (data only)..."
-supabase db dump --data-only --db-url "${SUPABASE_DB_URL}" -f "${DUMP_FILE}"
+PGPASSWORD="${SUPABASE_DB_PASSWORD}" pg_dump \
+  --host "db.${SUPABASE_PROJECT_REF}.supabase.co" \
+  --port 5432 \
+  --username postgres \
+  --dbname postgres \
+  --data-only \
+  --no-owner \
+  --no-privileges \
+  -f "${DUMP_FILE}"
 
 echo "==> Computing checksum..."
 new_checksum=$(sha256sum "${DUMP_FILE}" | awk '{print $1}')
