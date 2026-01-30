@@ -8,6 +8,7 @@ import { usePodNames } from '@/hooks/useLeaderboard'
 import { useDeckStats } from '@/hooks/useDeckStats'
 import { useGameHistory } from '@/hooks/useGameHistory'
 import { useDeckStatsByPod } from '@/hooks/useDeckStatsByPod'
+import { useDeckStreaks } from '@/hooks/useDeckStreaks'
 import WinRateTrendChart from '@/components/WinRateTrendChart'
 import { BarChart3, Clock, Layers, TrendingUp } from 'lucide-react'
 
@@ -31,6 +32,8 @@ const Statistics = () => {
     useDeckStats()
   const { data: gameHistoryData = [], isLoading: gameHistoryLoading } =
     useGameHistory()
+
+  const deckStreaks = useDeckStreaks(gameHistoryData)
 
   const deckStatsByPod = useDeckStatsByPod({
     gameHistory: gameHistoryData,
@@ -126,6 +129,7 @@ const Statistics = () => {
           <TabsContent value="deck-stats">
             <DeckStatsTable
               data={filteredDeckStats}
+              streaks={deckStreaks}
               isLoading={deckStatsLoading}
               playerFilter={{
                 players: ownerNames,

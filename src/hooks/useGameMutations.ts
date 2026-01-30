@@ -6,6 +6,7 @@ interface GameResult {
   player_id: string
   deck_id: string
   outcome: Outcome
+  unsatisfying: boolean
 }
 
 interface CreateGameInput {
@@ -52,6 +53,7 @@ export const useGameMutations = () => {
         player_id: result.player_id,
         deck_id: result.deck_id,
         outcome: result.outcome,
+        unsatisfying: result.unsatisfying,
       }))
 
       const { error: resultsError } = await supabase

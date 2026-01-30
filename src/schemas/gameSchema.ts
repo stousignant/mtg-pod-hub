@@ -7,6 +7,7 @@ export const gameResultSchema = z.object({
   player_id: z.string().min(1, 'Player is required'),
   deck_id: z.string().min(1, 'Deck is required'),
   outcome: z.enum(outcomeValues, { required_error: 'Outcome is required' }),
+  unsatisfying: z.boolean().default(false),
 })
 
 export const gameFormSchema = z.object({

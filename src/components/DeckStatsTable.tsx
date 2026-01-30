@@ -6,9 +6,10 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Layers } from 'lucide-react'
+import { Layers, TrendingUp, TrendingDown, AlertTriangle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { DeckStatsEntry } from '@/data/mockData'
+import type { DeckStreaks } from '@/lib/streakCalculations'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import PlayerFilter from './PlayerFilter'
@@ -18,6 +19,7 @@ import type { PlayerFilterConfig, PodFilterConfig } from '@/types/leaderboard'
 
 interface DeckStatsTableProps {
   data: DeckStatsEntry[]
+  streaks: DeckStreaks[]
   isLoading: boolean
   playerFilter: PlayerFilterConfig
   podFilter: Omit<PodFilterConfig, 'showAllPods'>
@@ -27,6 +29,7 @@ interface DeckStatsTableProps {
 
 const DeckStatsTable = ({
   data,
+  streaks,
   isLoading,
   playerFilter,
   podFilter,
@@ -95,6 +98,10 @@ const DeckStatsTable = ({
           {data.map((deck, index) => {
             const isFirst = index === RANKING.FIRST_PLACE_INDEX
             const hasImage = !!deck.commander_image_url
+            const deckStreak = streaks.find(s => s.deckName === deck.deck_name)
+            const hasTrashTestWarning =
+              deckStreak?.currentStreakType === 'loss' &&
+              deckStreak.currentStreak >= 7
 
             return (
               <div
@@ -138,29 +145,79 @@ const DeckStatsTable = ({
                 </div>
 
                 {/* Stats bar */}
-                <div className="bg-card/90 backdrop-blur-sm px-4 py-3 flex items-center justify-between">
-                  <span className="text-muted-foreground text-sm">
-                    {deck.owner_name}
-                  </span>
-
-                  <div className="flex items-center gap-4 sm:gap-6 text-sm">
-                    <div className="flex gap-3 text-muted-foreground">
-                      <span>{deck.games_played} games</span>
-                      <span>{deck.wins} wins</span>
-                    </div>
-                    <span
-                      className={cn(
-                        'font-bold text-lg',
-                        deck.win_rate >= WIN_RATE.THRESHOLD.GOOD
-                          ? WIN_RATE.COLOR.GOOD
-                          : deck.win_rate >= WIN_RATE.THRESHOLD.AVERAGE
-                            ? WIN_RATE.COLOR.AVERAGE
-                            : WIN_RATE.COLOR.POOR
-                      )}
-                    >
-                      {deck.win_rate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
+                <div className="bg-card/90 backdrop-blur-sm px-4 py-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-muted-foreground text-sm">
+                      {deck.owner_name}
                     </span>
+
+                    <div className="flex items-center gap-4 sm:gap-6 text-sm">
+                      <div className="flex gap-3 text-muted-foreground">
+                        <span>{deck.games_played} games</span>
+                        <span>{deck.wins} wins</span>
+                      </div>
+                      <span
+                        className={cn(
+                          'font-bold text-lg',
+                          deck.win_rate >= WIN_RATE.THRESHOLD.GOOD
+                            ? WIN_RATE.COLOR.GOOD
+                            : deck.win_rate >= WIN_RATE.THRESHOLD.AVERAGE
+                              ? WIN_RATE.COLOR.AVERAGE
+                              : WIN_RATE.COLOR.POOR
+                        )}
+                      >
+                        {deck.win_rate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
+                      </span>
+                    </div>
                   </div>
+
+                  {/* Streaks */}
+                  {deckStreak && (
+                    <div className="flex items-center gap-4 text-xs border-t border-border/30 pt-2">
+                      {/* Current Streak */}
+                      {deckStreak.currentStreakType && (
+                        <div
+                          className={cn(
+                            'flex items-center gap-1',
+                            hasTrashTestWarning && 'text-rose-400'
+                          )}
+                        >
+                          {hasTrashTestWarning && (
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                          )}
+                          {deckStreak.currentStreakType === 'win' ? (
+                            <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
+                          ) : (
+                            <TrendingDown className="h-3.5 w-3.5" />
+                          )}
+                          <span className="text-muted-foreground">
+                            Current: {deckStreak.currentStreak}{' '}
+                            {deckStreak.currentStreakType === 'win' ? 'W' : 'L'}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Best Win Streak */}
+                      {deckStreak.bestWinStreak > 0 && (
+                        <div className="flex items-center gap-1">
+                          <TrendingUp className="h-3.5 w-3.5 text-emerald-400/60" />
+                          <span className="text-muted-foreground">
+                            Best: {deckStreak.bestWinStreak} W
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Worst Lose Streak */}
+                      {deckStreak.worstLoseStreak > 0 && (
+                        <div className="flex items-center gap-1">
+                          <TrendingDown className="h-3.5 w-3.5 text-rose-400/60" />
+                          <span className="text-muted-foreground">
+                            Worst: {deckStreak.worstLoseStreak} L
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )

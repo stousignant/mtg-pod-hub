@@ -44,11 +44,19 @@ const formatDate = (dateString: string) => {
   })
 }
 
-const OutcomeBadge = ({ outcome }: { outcome: string }) => {
+const OutcomeBadge = ({
+  outcome,
+  unsatisfying,
+}: {
+  outcome: string
+  unsatisfying?: boolean
+}) => {
   const config = {
     [OUTCOME.WIN]: {
       label: 'W',
-      className: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+      className: unsatisfying
+        ? 'bg-emerald-500/10 text-emerald-400/60 border-emerald-500/20'
+        : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     },
     [OUTCOME.LOSS]: {
       label: 'L',
@@ -68,6 +76,7 @@ const OutcomeBadge = ({ outcome }: { outcome: string }) => {
       className={cn('text-xs font-bold px-2', className)}
     >
       {label}
+      {unsatisfying && outcome === OUTCOME.WIN ? '*' : ''}
     </Badge>
   )
 }
@@ -221,7 +230,10 @@ const GameTimeline = ({
                               <span className="text-xs text-muted-foreground hidden sm:inline">
                                 {result.deck_name}
                               </span>
-                              <OutcomeBadge outcome={result.outcome} />
+                              <OutcomeBadge
+                                outcome={result.outcome}
+                                unsatisfying={result.unsatisfying}
+                              />
                             </div>
                           ))}
                       </div>
