@@ -69,7 +69,7 @@ delete_file() {
 }
 
 echo "==> Linking Supabase project..."
-supabase link --project-ref "${SUPABASE_PROJECT_REF}"
+supabase link --project-ref "${SUPABASE_PROJECT_REF}" --password "${SUPABASE_DB_PASSWORD}"
 
 echo "==> Dumping database (data only)..."
 supabase db dump --data-only -f "${DUMP_FILE}"
