@@ -6,12 +6,17 @@ A modern web application for tracking Magic: The Gathering competitive pod leagu
 
 ## Features
 
-- **Pod Leaderboards** - Track player standings ranked by points across different pods
-- **Win Rate Analytics** - Visualize player performance with interactive charts
-- **Deck Statistics** - Analyze deck win rates and performance metrics
+- **Pod Leaderboards** - Player standings ranked by points with podium display and player cards
+- **Win Rate Analytics** - Interactive charts with trend tracking over time
+- **Deck Statistics** - Deck win rates and performance metrics filtered by pod
+- **Game History** - Timeline view of recorded matches
+- **Game Entry** - Admin interface for recording new game results
+- **Player & Pod Filtering** - Filter data by pod, player, and player count
+- **Authentication** - Protected admin routes with Supabase Auth
 - **Real-time Updates** - Live data synchronization via Supabase
+- **Automated Backups** - Daily database backups to Supabase Storage via GitHub Actions
 - **Offline Support** - Mock data fallback for development without database
-- **Responsive Design** - Optimized for desktop and mobile devices
+- **Responsive Design** - Mobile-first with adaptive navigation
 - **Dark Theme** - Mystical purple and blue MTG-inspired aesthetic
 
 ## Tech Stack
@@ -34,12 +39,12 @@ A modern web application for tracking Magic: The Gathering competitive pod leagu
 
 ### DevOps & Quality
 
-- **GitHub Actions** - CI/CD pipeline
+- **GitHub Actions** - CI pipeline and automated daily database backups
 - **Vitest** - Unit testing
 - **ESLint** - Code linting
 - **Prettier** - Code formatting
 - **Husky** - Pre-commit hooks
-- **Docker** - Containerization
+- **Docker** - Containerization (dev and production)
 
 ## Quick Start
 
@@ -116,7 +121,9 @@ mtg-pod-hub/
 │   ├── data/            # Mock data & TypeScript interfaces
 │   ├── constants/       # Centralized configuration
 │   └── test/            # Test utilities
-├── .github/workflows/   # CI/CD pipelines
+├── .github/workflows/   # CI and backup pipelines
+├── scripts/             # Automation scripts (DB backup)
+├── migrations/          # SQL migration files
 ├── public/              # Static assets
 └── ...config files
 ```
@@ -191,6 +198,33 @@ Production image includes:
 - Nginx server with gzip compression
 - Security headers configured
 - Health check endpoint at `/health`
+
+## Database Backups
+
+Automated daily backups run via GitHub Actions at 3 AM UTC. The workflow:
+
+1. Dumps all table data using `pg_dump`
+2. Compares against the previous backup checksum
+3. Uploads to a private Supabase Storage bucket if changes are detected
+4. Retains the last 30 backups
+
+Backups can also be triggered manually via `workflow_dispatch` in the Actions tab.
+
+### Required GitHub Secrets
+
+| Secret                      | Description                                            |
+| --------------------------- | ------------------------------------------------------ |
+| `SUPABASE_PROJECT_REF`      | Project reference ID                                   |
+| `SUPABASE_URL`              | Project API URL                                        |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key (Project Settings → API)              |
+| `SUPABASE_DB_PASSWORD`      | Database password (Project Settings → Database)        |
+| `SUPABASE_POOLER_HOST`      | Session mode pooler host (Project Settings → Database) |
+
+### Setup
+
+1. Create a private `backups` bucket in Supabase Storage
+2. Add the secrets above to your GitHub repository
+3. The workflow runs automatically, or trigger manually from the Actions tab
 
 ## Environment Variables
 
