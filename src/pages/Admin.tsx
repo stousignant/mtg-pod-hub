@@ -1,6 +1,8 @@
-import { Shield } from 'lucide-react'
+import { Shield, Gamepad2, Database } from 'lucide-react'
 import Header from '@/components/Header'
 import { GameEntryForm } from '@/components/GameEntryForm'
+import { DeckManagementForm } from '@/components/DeckManagementForm'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export const Admin = () => {
   return (
@@ -19,7 +21,33 @@ export const Admin = () => {
           </p>
         </div>
 
-        <GameEntryForm />
+        <Tabs defaultValue="games" className="space-y-6">
+          <TabsList className="w-full bg-muted/50 border border-border">
+            <TabsTrigger
+              value="games"
+              className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+            >
+              <Gamepad2 className="h-4 w-4" />
+              <span>Game Entry</span>
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="decks"
+              className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+            >
+              <Database className="h-4 w-4" />
+              <span>Deck Management</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="games">
+            <GameEntryForm />
+          </TabsContent>
+
+          <TabsContent value="decks">
+            <DeckManagementForm />
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   )

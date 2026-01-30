@@ -10,7 +10,7 @@ export const useDecks = (playerId?: string) => {
       if (isSupabaseConnected() && supabase) {
         let query = supabase
           .from(DB_TABLES.DECKS)
-          .select('id, name, commander_name, owner_id')
+          .select('id, name, commander_name, owner_id, commander_image_url')
 
         if (playerId) {
           query = query.eq('owner_id', playerId)

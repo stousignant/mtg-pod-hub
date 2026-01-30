@@ -51,6 +51,7 @@ export interface Deck {
   name: string
   commander_name: string
   owner_id: string
+  commander_image_url: string | null
 }
 
 export const mockPodLeaderboard: PodLeaderboardEntry[] = [
@@ -539,59 +540,69 @@ export const mockDecks: Deck[] = [
     name: 'Dimir Control',
     commander_name: 'Scarab God',
     owner_id: '1',
+    commander_image_url: null,
   },
   {
     id: '2',
     name: 'Grixis Reanimator',
     commander_name: 'Sedris, the Traitor King',
     owner_id: '2',
+    commander_image_url: null,
   },
   {
     id: '3',
     name: 'Mono Blue Tempo',
     commander_name: 'Baral, Chief of Compliance',
     owner_id: '3',
+    commander_image_url: null,
   },
   {
     id: '4',
     name: 'Krenko Goblins',
     commander_name: 'Krenko, Mob Boss',
     owner_id: '4',
+    commander_image_url: null,
   },
   {
     id: '5',
     name: 'Selesnya Tokens',
     commander_name: 'Rhys the Redeemed',
     owner_id: '5',
+    commander_image_url: null,
   },
   {
     id: '6',
     name: 'Burn Everything',
     commander_name: 'Purphoros, God of the Forge',
     owner_id: '6',
+    commander_image_url: null,
   },
   {
     id: '7',
     name: 'Eldrazi Menace',
     commander_name: 'Kozilek, the Great Distortion',
     owner_id: '9',
+    commander_image_url: null,
   },
   {
     id: '8',
     name: 'Vampire Aristocrats',
     commander_name: 'Edgar Markov',
     owner_id: '8',
+    commander_image_url: null,
   },
   {
     id: '9',
     name: 'Artifact Combo',
     commander_name: 'Urza, Lord High Artificer',
     owner_id: '10',
+    commander_image_url: null,
   },
   {
     id: '10',
     name: 'Spirit Tribal',
     commander_name: 'Ugin, the Spirit Dragon',
     owner_id: '11',
+    commander_image_url: null,
   },
 ]
