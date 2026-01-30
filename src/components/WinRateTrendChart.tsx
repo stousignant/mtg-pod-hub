@@ -15,6 +15,7 @@ import { TrendingUp } from 'lucide-react'
 import PodFilter from './PodFilter'
 import type { GameHistoryEntry } from '@/data/mockData'
 import { CHART, UI, OUTCOME } from '@/constants/config'
+import { calculatePercentile } from '@/lib/utils'
 
 const ALL_PODS_VALUE = '__all__'
 
@@ -101,10 +102,30 @@ const WinRateTrendChart = ({
     const allValues = Array.from(playerSeries.values()).flatMap(s =>
       s.map(p => p.winRate)
     )
-    const dataMin =
-      allValues.length > 0 ? Math.min(...allValues) : CHART.AXIS.Y_DOMAIN_MIN
-    const dataMax =
-      allValues.length > 0 ? Math.max(...allValues) : CHART.AXIS.Y_DOMAIN_MAX
+
+    let dataMin = CHART.AXIS.Y_DOMAIN_MIN
+    let dataMax = CHART.AXIS.Y_DOMAIN_MAX
+
+    if (allValues.length > 0) {
+      dataMin = calculatePercentile(allValues, CHART.AXIS.Y_PERCENTILE_MIN)
+      dataMax = calculatePercentile(allValues, CHART.AXIS.Y_PERCENTILE_MAX)
+
+      console.log('Win Rate Trend Chart - Y-Axis Calculation:', {
+        totalValues: allValues.length,
+        allValues: allValues.sort((a, b) => a - b),
+        percentile5th: dataMin,
+        percentile95th: dataMax,
+        yMin: Math.max(
+          CHART.AXIS.Y_DOMAIN_MIN,
+          Math.floor(dataMin - CHART.AXIS.Y_AUTO_PADDING)
+        ),
+        yMax: Math.min(
+          CHART.AXIS.Y_DOMAIN_MAX,
+          Math.ceil(dataMax + CHART.AXIS.Y_AUTO_PADDING)
+        ),
+      })
+    }
+
     const yMin = Math.max(
       CHART.AXIS.Y_DOMAIN_MIN,
       Math.floor(dataMin - CHART.AXIS.Y_AUTO_PADDING)
@@ -114,10 +135,14 @@ const WinRateTrendChart = ({
       Math.ceil(dataMax + CHART.AXIS.Y_AUTO_PADDING)
     )
 
+    const domain: [number, number] = [yMin, yMax]
+
+    console.log('Returning domain:', domain)
+
     return {
       chartData: merged,
       playerNames: allPlayerNames,
-      yDomain: [yMin, yMax] as [number, number],
+      yDomain: domain,
     }
   }, [filteredData])
 
@@ -160,6 +185,7 @@ const WinRateTrendChart = ({
                 left: CHART.MARGIN.LEFT,
                 bottom: CHART.MARGIN.BOTTOM,
               }}
+              key={`${yDomain[0]}-${yDomain[1]}`}
             >
               <CartesianGrid
                 strokeDasharray={CHART.GRID.STROKE_DASHARRAY}
@@ -183,11 +209,13 @@ const WinRateTrendChart = ({
                 }}
               />
               <YAxis
+                type="number"
                 stroke="hsl(var(--muted-foreground))"
                 fontSize={CHART.AXIS.FONT_SIZE}
                 tickLine={false}
                 axisLine={{ stroke: 'hsl(var(--border))' }}
-                domain={yDomain}
+                domain={[() => yDomain[0], () => yDomain[1]]}
+                allowDataOverflow={true}
                 tickFormatter={value => `${value}%`}
               />
               <Tooltip

@@ -29,3 +29,23 @@ export function calculateOlympicRanks<T extends { points: number }>(
 
   return rankedData
 }
+
+/**
+ * Calculate the percentile value from an array of numbers
+ * Uses linear interpolation between closest ranks
+ */
+export function calculatePercentile(
+  values: number[],
+  percentile: number
+): number {
+  if (values.length === 0) return 0
+
+  const sorted = [...values].sort((a, b) => a - b)
+  const index = (percentile / 100) * (sorted.length - 1)
+  const lower = Math.floor(index)
+  const upper = Math.ceil(index)
+  const weight = index - lower
+
+  if (lower === upper) return sorted[lower]
+  return sorted[lower] * (1 - weight) + sorted[upper] * weight
+}
