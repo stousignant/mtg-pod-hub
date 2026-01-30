@@ -74,16 +74,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       handleAuthStateChange(session)
+
+      if (session && window.location.hash.includes('access_token')) {
+        window.history.replaceState(null, '', window.location.pathname)
+      }
     })
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
       handleAuthStateChange(session)
-
-      if (_event === 'SIGNED_IN' && window.location.hash) {
-        window.history.replaceState(null, '', window.location.pathname)
-      }
     })
 
     return () => {
