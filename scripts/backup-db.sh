@@ -68,11 +68,8 @@ delete_file() {
     -o /dev/null
 }
 
-echo "==> Linking Supabase project..."
-supabase link --project-ref "${SUPABASE_PROJECT_REF}" --password "${SUPABASE_DB_PASSWORD}"
-
 echo "==> Dumping database (data only)..."
-supabase db dump --data-only -f "${DUMP_FILE}"
+supabase db dump --data-only --db-url "${SUPABASE_DB_URL}" -f "${DUMP_FILE}"
 
 echo "==> Computing checksum..."
 new_checksum=$(sha256sum "${DUMP_FILE}" | awk '{print $1}')
