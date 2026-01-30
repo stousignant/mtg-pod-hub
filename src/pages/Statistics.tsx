@@ -70,34 +70,34 @@ const Statistics = () => {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="bg-muted/50 border border-border">
+          <TabsList className="w-full bg-muted/50 border border-border">
             <TabsTrigger
               value="overview"
-              className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+              className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <BarChart3 className="h-4 w-4" />
-              <span className="inline">Overview</span>
+              <span>Overview</span>
             </TabsTrigger>
             <TabsTrigger
               value="game-history"
-              className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+              className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <Clock className="h-4 w-4" />
-              <span className="inline">Game History</span>
+              <span>History</span>
             </TabsTrigger>
             <TabsTrigger
               value="deck-stats"
-              className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+              className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <Layers className="h-4 w-4" />
-              <span className="inline">Deck Stats</span>
+              <span>Decks</span>
             </TabsTrigger>
             <TabsTrigger
               value="trends"
-              className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
+              className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <TrendingUp className="h-4 w-4" />
-              <span className="inline">Trends</span>
+              <span>Trends</span>
             </TabsTrigger>
           </TabsList>
 
