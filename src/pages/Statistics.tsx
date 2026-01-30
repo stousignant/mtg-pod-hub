@@ -14,10 +14,12 @@ import { BarChart3, Clock, Layers, TrendingUp } from 'lucide-react'
 
 const ALL_PLAYERS_VALUE = '__all__'
 const ALL_PODS_VALUE = '__all__'
+const ALL_DECKS_VALUE = '__all__'
 
 const Statistics = () => {
   const { data: pods = [], isLoading: podsLoading } = usePodNames()
   const [selectedPod, setSelectedPod] = useState<string>(ALL_PODS_VALUE)
+  const [selectedDeck, setSelectedDeck] = useState<string>(ALL_DECKS_VALUE)
   const [selectedOverviewPod, setSelectedOverviewPod] =
     useState<string>(ALL_PODS_VALUE)
   const [selectedTrendPod, setSelectedTrendPod] =
@@ -40,6 +42,11 @@ const Statistics = () => {
     selectedPod: selectedDeckStatsPod,
     allPodsValue: ALL_PODS_VALUE,
   })
+
+  const deckNames = useMemo(() => {
+    const unique = [...new Set(gameHistoryData.map(d => d.deck_name))]
+    return unique.sort()
+  }, [gameHistoryData])
 
   const ownerNames = useMemo(() => {
     const baseData = deckStatsByPod || deckStatsData
@@ -123,6 +130,10 @@ const Statistics = () => {
               selectedPod={selectedPod}
               onPodChange={setSelectedPod}
               podsLoading={podsLoading}
+              decks={deckNames}
+              selectedDeck={selectedDeck}
+              onDeckChange={setSelectedDeck}
+              decksLoading={gameHistoryLoading}
             />
           </TabsContent>
 
