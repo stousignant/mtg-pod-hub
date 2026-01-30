@@ -153,15 +153,15 @@ const computePlayerStats = (data: GameHistoryEntry[]): PlayerStats[] => {
         }
       }
       const MIN_STREAK_TO_DISPLAY = 2
-      const streakWord =
+      const streakAbbreviation =
         streakOutcome === OUTCOME.WIN
-          ? 'win'
+          ? 'W'
           : streakOutcome === OUTCOME.LOSS
-            ? 'loss'
-            : 'draw'
+            ? 'L'
+            : 'D'
       const currentStreak =
         streakCount >= MIN_STREAK_TO_DISPLAY
-          ? `${streakCount} ${streakWord} streak`
+          ? `${streakCount}${streakAbbreviation}`
           : null
 
       const longestWinStreak = computeLongestStreak(entries, OUTCOME.WIN)
@@ -345,38 +345,51 @@ const OverviewStats = ({
                     </div>
                   </div>
 
-                  <div className="bg-card/90 backdrop-blur-sm px-4 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-3 text-sm">
+                  <div className="bg-card/90 backdrop-blur-sm px-4 py-3 space-y-2">
+                    <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">
                         {player.gamesPlayed} games
                       </span>
-                      {player.longestWinStreak > 0 && (
-                        <span className="text-emerald-400 font-mono text-xs bg-emerald-500/10 px-2 py-1 rounded">
-                          Best W: {player.longestWinStreak}
+                      <div className="flex items-center gap-4 sm:gap-6">
+                        <div className="flex gap-2">
+                          <span className="text-emerald-400">
+                            {player.wins}W
+                          </span>
+                          <span className="text-amber-400">
+                            {player.draws}D
+                          </span>
+                          <span className="text-rose-400">
+                            {player.losses}L
+                          </span>
+                        </div>
+                        <span className="font-bold text-lg text-amber-400">
+                          {player.winRate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
                         </span>
-                      )}
-                      {player.longestLossStreak > 0 && (
-                        <span className="text-rose-400 font-mono text-xs bg-rose-500/10 px-2 py-1 rounded">
-                          Worst L: {player.longestLossStreak}
-                        </span>
-                      )}
-                      {player.currentStreak && (
-                        <span className="text-muted-foreground font-mono text-xs bg-muted/50 px-2 py-1 rounded">
-                          Current: {player.currentStreak}
-                        </span>
-                      )}
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-4 sm:gap-6 text-sm">
-                      <div className="flex gap-2">
-                        <span className="text-emerald-400">{player.wins}W</span>
-                        <span className="text-amber-400">{player.draws}D</span>
-                        <span className="text-rose-400">{player.losses}L</span>
+                    {(player.longestWinStreak > 0 ||
+                      player.longestLossStreak > 0 ||
+                      player.currentStreak) && (
+                      <div className="flex items-center gap-3 flex-wrap text-xs">
+                        <span className="text-muted-foreground">Streaks:</span>
+                        {player.longestWinStreak > 0 && (
+                          <span className="text-emerald-400 font-mono bg-emerald-500/10 px-2 py-1 rounded">
+                            Best W: {player.longestWinStreak}
+                          </span>
+                        )}
+                        {player.longestLossStreak > 0 && (
+                          <span className="text-rose-400 font-mono bg-rose-500/10 px-2 py-1 rounded">
+                            Worst L: {player.longestLossStreak}
+                          </span>
+                        )}
+                        {player.currentStreak && (
+                          <span className="text-muted-foreground font-mono bg-muted/50 px-2 py-1 rounded">
+                            Current: {player.currentStreak}
+                          </span>
+                        )}
                       </div>
-                      <span className="font-bold text-lg text-amber-400">
-                        {player.winRate.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%
-                      </span>
-                    </div>
+                    )}
                   </div>
                 </div>
               )

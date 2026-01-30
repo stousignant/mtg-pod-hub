@@ -38,10 +38,11 @@ export const WIN_RATE = {
 export const CHART = {
   HEIGHT: 300,
   HEIGHT_WITH_LEGEND: 600,
+  MIN_WIDTH: 600,
   MARGIN: {
     TOP: 20,
     RIGHT: 30,
-    LEFT: 20,
+    LEFT: 5,
     BOTTOM: 60,
   },
   AXIS: {

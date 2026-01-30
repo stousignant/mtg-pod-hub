@@ -149,77 +149,81 @@ const WinRateTrendChart = ({
           allPodsValue={ALL_PODS_VALUE}
         />
       </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={CHART.HEIGHT_WITH_LEGEND}>
-          <LineChart
-            data={chartData}
-            margin={{
-              top: CHART.MARGIN.TOP,
-              right: CHART.MARGIN.RIGHT,
-              left: CHART.MARGIN.LEFT,
-              bottom: CHART.MARGIN.BOTTOM,
-            }}
-          >
-            <CartesianGrid
-              strokeDasharray={CHART.GRID.STROKE_DASHARRAY}
-              stroke="hsl(var(--border))"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="gameNumber"
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={CHART.AXIS.FONT_SIZE}
-              tickLine={false}
-              axisLine={{ stroke: 'hsl(var(--border))' }}
-              label={{
-                value: 'Game #',
-                position: 'insideBottom',
-                offset: -10,
-                style: {
-                  fill: 'hsl(var(--muted-foreground))',
-                  fontSize: CHART.AXIS.FONT_SIZE,
-                },
+      <CardContent className="overflow-x-auto">
+        <div style={{ minWidth: CHART.MIN_WIDTH }}>
+          <ResponsiveContainer width="100%" height={CHART.HEIGHT_WITH_LEGEND}>
+            <LineChart
+              data={chartData}
+              margin={{
+                top: CHART.MARGIN.TOP,
+                right: CHART.MARGIN.RIGHT,
+                left: CHART.MARGIN.LEFT,
+                bottom: CHART.MARGIN.BOTTOM,
               }}
-            />
-            <YAxis
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={CHART.AXIS.FONT_SIZE}
-              tickLine={false}
-              axisLine={{ stroke: 'hsl(var(--border))' }}
-              domain={yDomain}
-              tickFormatter={value => `${value}%`}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--card))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: `${CHART.TOOLTIP.BORDER_RADIUS}px`,
-                color: 'hsl(var(--foreground))',
-              }}
-              formatter={(value: number) => [
-                `${value.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%`,
-              ]}
-              labelFormatter={label => `Game #${label}`}
-            />
-            <Legend
-              verticalAlign="top"
-              align="center"
-              wrapperStyle={{ paddingBottom: 16 }}
-            />
-            {playerNames.map((name, index) => (
-              <Line
-                key={name}
-                type="monotone"
-                dataKey={name}
-                stroke={CHART.PLAYER_COLORS[index % CHART.PLAYER_COLORS.length]}
-                strokeWidth={CHART.LINE.STROKE_WIDTH}
-                dot={{ r: CHART.LINE.DOT_RADIUS }}
-                activeDot={{ r: CHART.LINE.ACTIVE_DOT_RADIUS }}
-                connectNulls={false}
+            >
+              <CartesianGrid
+                strokeDasharray={CHART.GRID.STROKE_DASHARRAY}
+                stroke="hsl(var(--border))"
+                vertical={false}
               />
-            ))}
-          </LineChart>
-        </ResponsiveContainer>
+              <XAxis
+                dataKey="gameNumber"
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={CHART.AXIS.FONT_SIZE}
+                tickLine={false}
+                axisLine={{ stroke: 'hsl(var(--border))' }}
+                label={{
+                  value: 'Game #',
+                  position: 'insideBottom',
+                  offset: -10,
+                  style: {
+                    fill: 'hsl(var(--muted-foreground))',
+                    fontSize: CHART.AXIS.FONT_SIZE,
+                  },
+                }}
+              />
+              <YAxis
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={CHART.AXIS.FONT_SIZE}
+                tickLine={false}
+                axisLine={{ stroke: 'hsl(var(--border))' }}
+                domain={yDomain}
+                tickFormatter={value => `${value}%`}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'hsl(var(--card))',
+                  border: '1px solid hsl(var(--border))',
+                  borderRadius: `${CHART.TOOLTIP.BORDER_RADIUS}px`,
+                  color: 'hsl(var(--foreground))',
+                }}
+                formatter={(value: number) => [
+                  `${value.toFixed(UI.DECIMAL_PLACES.WIN_RATE)}%`,
+                ]}
+                labelFormatter={label => `Game #${label}`}
+              />
+              <Legend
+                verticalAlign="top"
+                align="center"
+                wrapperStyle={{ paddingBottom: 16 }}
+              />
+              {playerNames.map((name, index) => (
+                <Line
+                  key={name}
+                  type="monotone"
+                  dataKey={name}
+                  stroke={
+                    CHART.PLAYER_COLORS[index % CHART.PLAYER_COLORS.length]
+                  }
+                  strokeWidth={CHART.LINE.STROKE_WIDTH}
+                  dot={{ r: CHART.LINE.DOT_RADIUS }}
+                  activeDot={{ r: CHART.LINE.ACTIVE_DOT_RADIUS }}
+                  connectNulls={false}
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </CardContent>
     </Card>
   )
