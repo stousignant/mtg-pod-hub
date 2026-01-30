@@ -57,14 +57,14 @@ const Header = () => {
           </h1>
         </Link>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <nav className="flex items-center gap-1">
             {navItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  'px-4 py-2 rounded-md text-sm font-medium transition-colors',
+                  'px-2 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors',
                   location.pathname === item.path
                     ? 'bg-primary/20 text-primary'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted'
