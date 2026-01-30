@@ -66,21 +66,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setIsLoading(false)
   }
 
-  const clearAuthHashFromUrl = () => {
-    console.log(
-      '[Auth] clearAuthHashFromUrl called, hash:',
-      window.location.hash.substring(0, 50)
-    )
-    if (window.location.hash.includes('access_token')) {
-      console.log('[Auth] Clearing access_token from URL hash')
-      window.history.replaceState(
-        null,
-        '',
-        window.location.pathname + window.location.search
-      )
-    }
-  }
-
   useEffect(() => {
     if (!supabase) {
       setIsLoading(false)
@@ -90,20 +75,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      console.log(
-        '[Auth] onAuthStateChange event:',
-        _event,
-        'session:',
-        !!session
-      )
       handleAuthStateChange(session)
-      clearAuthHashFromUrl()
     })
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('[Auth] getSession result:', !!session)
       handleAuthStateChange(session)
-      clearAuthHashFromUrl()
     })
 
     return () => {
