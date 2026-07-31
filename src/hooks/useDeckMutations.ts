@@ -6,6 +6,11 @@ import type { DeckFormData } from '@/schemas/deckSchema'
 export const useDeckMutations = () => {
   const queryClient = useQueryClient()
 
+  const invalidateDeckQueries = () => {
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DECKS] })
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DECK_STATS] })
+  }
+
   const createDeck = useMutation({
     mutationFn: async (input: DeckFormData) => {
       if (!isSupabaseConnected() || !supabase) {
@@ -26,11 +31,32 @@ export const useDeckMutations = () => {
       if (error) throw error
       return data
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DECKS] })
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DECK_STATS] })
-    },
+    onSuccess: invalidateDeckQueries,
   })
 
-  return { createDeck }
+  const updateDeck = useMutation({
+    mutationFn: async ({ id, input }: { id: string; input: DeckFormData }) => {
+      if (!isSupabaseConnected() || !supabase) {
+        throw new Error('Database not connected')
+      }
+
+      const { data, error } = await supabase
+        .from(DB_TABLES.DECKS)
+        .update({
+          name: input.name,
+          commander_name: input.commander_name,
+          owner_id: input.owner_id,
+          commander_image_url: input.commander_image_url || null,
+        })
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    },
+    onSuccess: invalidateDeckQueries,
+  })
+
+  return { createDeck, updateDeck }
 }
