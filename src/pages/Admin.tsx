@@ -1,7 +1,8 @@
-import { Shield, Gamepad2, Database } from 'lucide-react'
+import { Shield, Gamepad2, Database, Users } from 'lucide-react'
 import Header from '@/components/Header'
 import { GameEntryForm } from '@/components/GameEntryForm'
 import { DeckManagementForm } from '@/components/DeckManagementForm'
+import { PlayerManagementForm } from '@/components/PlayerManagementForm'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export const Admin = () => {
@@ -22,13 +23,14 @@ export const Admin = () => {
         </div>
 
         <Tabs defaultValue="games" className="space-y-6">
-          <TabsList className="w-full bg-muted/50 border border-border">
+          <TabsList className="grid h-auto w-full grid-cols-3 bg-muted/50 border border-border">
             <TabsTrigger
               value="games"
               className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <Gamepad2 className="h-4 w-4" />
-              <span>Game Entry</span>
+              <span className="hidden sm:inline">Game Entry</span>
+              <span className="sm:hidden">Games</span>
             </TabsTrigger>
 
             <TabsTrigger
@@ -36,7 +38,16 @@ export const Admin = () => {
               className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
             >
               <Database className="h-4 w-4" />
-              <span>Deck Management</span>
+              <span className="hidden sm:inline">Deck Management</span>
+              <span className="sm:hidden">Decks</span>
+            </TabsTrigger>
+
+            <TabsTrigger
+              value="players"
+              className="min-w-0 gap-2 px-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+            >
+              <Users className="h-4 w-4 shrink-0" />
+              <span>Players</span>
             </TabsTrigger>
           </TabsList>
 
@@ -46,6 +57,10 @@ export const Admin = () => {
 
           <TabsContent value="decks">
             <DeckManagementForm />
+          </TabsContent>
+
+          <TabsContent value="players">
+            <PlayerManagementForm />
           </TabsContent>
         </Tabs>
       </main>
