@@ -1,6 +1,7 @@
 # Database Migrations
 
-These SQL files need to be run in the Supabase SQL Editor in order.
+These SQL files need to be applied to Supabase in order. For production, run
+the **Apply Database Migration** GitHub workflow with the migration path.
 
 ## Setup Instructions
 
@@ -11,6 +12,9 @@ Execute the following SQL files in order in the Supabase SQL Editor:
 1. **001_user_profiles.sql** - Creates user profiles table with admin flag
 2. **002_admin_rls_policies.sql** - Adds RLS policies for admin-only game writes
 3. **003_set_admin_user.sql** - Sets your account as admin (update email first!)
+4. **004_public_read_policies.sql** - Enables public reads for lookup tables
+5. **005_pod_members.sql** - Adds pod membership management
+6. **006_admin_deck_write_policies.sql** - Allows admins to create and update decks
 
 ### 2. Configure Google OAuth
 
@@ -81,7 +85,7 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 ## Security Notes
 
 - RLS is enabled on all tables
-- Only admins can insert games and game results
+- Only admins can insert games and game results or create and update decks
 - Users cannot modify their own `is_admin` flag
 - All policies are server-side enforced
 - Admin flag can only be set via direct SQL by database owner

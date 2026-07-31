@@ -64,4 +64,30 @@ describe('useDeckMutations', () => {
       queryKey: [QUERY_KEYS.DECK_STATS],
     })
   })
+
+  it('surfaces Supabase update errors as user-readable errors', async () => {
+    mocks.single.mockResolvedValue({
+      data: null,
+      error: { message: 'new row violates row-level security policy' },
+    })
+    const queryClient = new QueryClient({
+      defaultOptions: { mutations: { retry: false } },
+    })
+    const wrapper = ({ children }: PropsWithChildren) => (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    )
+    const { result } = renderHook(() => useDeckMutations(), { wrapper })
+
+    await expect(
+      result.current.updateDeck.mutateAsync({
+        id: 'deck-1',
+        input: {
+          name: 'Updated Deck',
+          commander_name: 'Updated Commander',
+          owner_id: 'player-2',
+          commander_image_url: '',
+        },
+      })
+    ).rejects.toThrow('new row violates row-level security policy')
+  })
 })

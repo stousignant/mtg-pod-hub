@@ -1,0 +1,43 @@
+name: Apply Database Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      migration:
+        description: "Migration file, for example migrations/006_admin_deck_write_policies.sql"
+        required: true
+        type: string
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    env:
+      MIGRATION_FILE: ${{ inputs.migration }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_POOLER_HOST: ${{ secrets.SUPABASE_POOLER_HOST }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate migration path
+        run: |
+          case "${MIGRATION_FILE}" in
+            migrations/[0-9][0-9][0-9]_*.sql) ;;
+            *) echo "Invalid migration path: ${MIGRATION_FILE}" >&2; exit 1 ;;
+          esac
+          test -f "${MIGRATION_FILE}"
+
+      - name: Apply migration in a transaction
+        env:
+          PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          psql \
+            --host "${SUPABASE_POOLER_HOST}" \
+            --port 5432 \
+            --username "postgres.${SUPABASE_PROJECT_REF}" \
+            --dbname postgres \
+            --set ON_ERROR_STOP=1 \
+            --single-transaction \
+            --file "${MIGRATION_FILE}"
