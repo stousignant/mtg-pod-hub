@@ -131,9 +131,16 @@ const GameTimeline = ({
       gameMap.get(entry.game_id)!.results.push(entry)
     }
 
-    return [...gameMap.values()].sort(
-      (a, b) => new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime()
-    )
+    return [...gameMap.values()].sort((a, b) => {
+      const dateDifference =
+        new Date(b.playedAt).getTime() - new Date(a.playedAt).getTime()
+
+      if (dateDifference !== 0) return dateDifference
+
+      // played_at stores only a date, so use the sequential game ID to keep
+      // multiple games from the same day in newest-entry-first order.
+      return b.gameId - a.gameId
+    })
   }, [data, selectedPod, selectedDeck])
 
   const gamesByDate = useMemo(() => {
