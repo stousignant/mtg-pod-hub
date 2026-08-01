@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase, isSupabaseConnected } from '@/lib/supabaseClient'
-import { DB_TABLES, QUERY_KEYS } from '@/constants/config'
+import { QUERY_KEYS } from '@/constants/config'
 import type { PodFormData } from '@/schemas/podSchema'
 
 export const usePodMutations = () => {
@@ -12,11 +12,10 @@ export const usePodMutations = () => {
         throw new Error('Database not connected')
       }
 
-      const { data, error } = await supabase
-        .from(DB_TABLES.PODS)
-        .insert({ name: input.name })
-        .select()
-        .single()
+      const { data, error } = await supabase.rpc('create_pod_with_players', {
+        p_name: input.name,
+        p_player_ids: input.player_ids.map(Number),
+      })
 
       if (error) throw new Error(error.message)
       return data
@@ -25,6 +24,7 @@ export const usePodMutations = () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.PODS] })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.POD_NAMES] })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.POD_LEADERBOARD] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.POD_MEMBERS] })
     },
   })
 

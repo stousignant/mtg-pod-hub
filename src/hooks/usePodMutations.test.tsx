@@ -2,20 +2,17 @@ import type { PropsWithChildren } from 'react'
 import { act, renderHook } from '@testing-library/react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { DB_TABLES, QUERY_KEYS } from '@/constants/config'
+import { QUERY_KEYS } from '@/constants/config'
 import { usePodMutations } from './usePodMutations'
 
 const mocks = vi.hoisted(() => ({
   isSupabaseConnected: vi.fn(),
-  from: vi.fn(),
-  insert: vi.fn(),
-  select: vi.fn(),
-  single: vi.fn(),
+  rpc: vi.fn(),
 }))
 
 vi.mock('@/lib/supabaseClient', () => ({
   isSupabaseConnected: mocks.isSupabaseConnected,
-  supabase: { from: mocks.from },
+  supabase: { rpc: mocks.rpc },
 }))
 
 const createWrapper = (queryClient: QueryClient) =>
@@ -29,16 +26,13 @@ describe('usePodMutations', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mocks.isSupabaseConnected.mockReturnValue(true)
-    mocks.single.mockResolvedValue({
+    mocks.rpc.mockResolvedValue({
       data: { id: 'pod-1', name: 'Tuesday Commander' },
       error: null,
     })
-    mocks.select.mockReturnValue({ single: mocks.single })
-    mocks.insert.mockReturnValue({ select: mocks.select })
-    mocks.from.mockReturnValue({ insert: mocks.insert })
   })
 
-  it('inserts a pod and invalidates pod-derived queries', async () => {
+  it('atomically creates a pod with players and invalidates pod-derived queries', async () => {
     const queryClient = new QueryClient({
       defaultOptions: { mutations: { retry: false } },
     })
@@ -48,15 +42,21 @@ describe('usePodMutations', () => {
     })
 
     await act(async () => {
-      await result.current.createPod.mutateAsync({ name: 'Tuesday Commander' })
+      await result.current.createPod.mutateAsync({
+        name: 'Tuesday Commander',
+        player_ids: ['1', '2'],
+      })
     })
 
-    expect(mocks.from).toHaveBeenCalledWith(DB_TABLES.PODS)
-    expect(mocks.insert).toHaveBeenCalledWith({ name: 'Tuesday Commander' })
+    expect(mocks.rpc).toHaveBeenCalledWith('create_pod_with_players', {
+      p_name: 'Tuesday Commander',
+      p_player_ids: [1, 2],
+    })
     for (const queryKey of [
       QUERY_KEYS.PODS,
       QUERY_KEYS.POD_NAMES,
       QUERY_KEYS.POD_LEADERBOARD,
+      QUERY_KEYS.POD_MEMBERS,
     ]) {
       expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: [queryKey] })
     }
@@ -72,13 +72,16 @@ describe('usePodMutations', () => {
     })
 
     await expect(
-      result.current.createPod.mutateAsync({ name: 'Tuesday Commander' })
+      result.current.createPod.mutateAsync({
+        name: 'Tuesday Commander',
+        player_ids: ['1'],
+      })
     ).rejects.toThrow('Database not connected')
-    expect(mocks.from).not.toHaveBeenCalled()
+    expect(mocks.rpc).not.toHaveBeenCalled()
   })
 
-  it('surfaces Supabase insert errors as user-readable errors', async () => {
-    mocks.single.mockResolvedValue({
+  it('surfaces RPC errors as user-readable errors', async () => {
+    mocks.rpc.mockResolvedValue({
       data: null,
       error: { message: 'new row violates row-level security policy' },
     })
@@ -90,7 +93,10 @@ describe('usePodMutations', () => {
     })
 
     await expect(
-      result.current.createPod.mutateAsync({ name: 'Tuesday Commander' })
+      result.current.createPod.mutateAsync({
+        name: 'Tuesday Commander',
+        player_ids: ['1'],
+      })
     ).rejects.toThrow('new row violates row-level security policy')
   })
 })
