@@ -9,18 +9,23 @@ interface GameResult {
   unsatisfying: boolean
 }
 
-interface CreateGameInput {
+export interface GameInput {
   pod_id: string
   game_date: string
   notes?: string
   results: GameResult[]
 }
 
+interface UpdateGameInput {
+  id: string
+  input: GameInput
+}
+
 export const useGameMutations = () => {
   const queryClient = useQueryClient()
 
   const createGame = useMutation({
-    mutationFn: async (input: CreateGameInput) => {
+    mutationFn: async (input: GameInput) => {
       if (!supabase) {
         throw new Error('Supabase not configured')
       }
@@ -71,10 +76,37 @@ export const useGameMutations = () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.POD_LEADERBOARD] })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DECK_STATS] })
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GAME_HISTORY] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_GAMES] })
     },
   })
 
-  return {
-    createGame,
-  }
+  const updateGame = useMutation({
+    mutationFn: async ({ id, input }: UpdateGameInput) => {
+      if (!supabase) throw new Error('Supabase not configured')
+
+      const { data, error } = await supabase.rpc('update_game_with_results', {
+        p_game_id: id,
+        p_pod_id: input.pod_id,
+        p_played_at: input.game_date,
+        p_notes: input.notes || null,
+        p_results: input.results.map(result => ({
+          player_id: result.player_id,
+          deck_id: result.deck_id,
+          outcome: result.outcome,
+          unsatisfying: result.unsatisfying,
+        })),
+      })
+
+      if (error) throw new Error(error.message)
+      return data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.POD_LEADERBOARD] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.DECK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.GAME_HISTORY] })
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.ADMIN_GAMES] })
+    },
+  })
+
+  return { createGame, updateGame }
 }

@@ -19,6 +19,7 @@ Execute the following SQL files in order in the Supabase SQL Editor:
 8. **008_admin_pod_insert_policy.sql** - Allows admins to create pods
 9. **009_create_pod_with_players.sql** - Creates pods and their player memberships atomically
 10. **010_set_pod_player_count.sql** - Derives the required pod player count from selected memberships
+11. **011_admin_game_updates.sql** - Allows admins to atomically update a game and replace its results
 
 ### 2. Configure Google OAuth
 
@@ -89,8 +90,10 @@ VITE_SUPABASE_ANON_KEY=your_anon_key
 ## Security Notes
 
 - RLS is enabled on all tables
-- Only admins can insert games and game results, create and update decks and players,
-  or create pods
+- Only admins can insert or update games, insert or delete game results, create and
+  update decks and players, or create pods
+- Existing game edits use a security-invoker function so the parent update and result
+  replacement commit or roll back together; no game deletion policy is granted
 - Pods cannot be updated or deleted through client RLS policies
 - Pod creation requires at least one valid player, derives `pods.player_count` from the
   deduplicated selections, and stores memberships in the same transaction

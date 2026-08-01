@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -6,6 +6,7 @@ import { usePodPlayers } from '@/hooks/usePodPlayers'
 import { usePods } from '@/hooks/usePods'
 import { useDecks } from '@/hooks/useDecks'
 import { useGameMutations } from '@/hooks/useGameMutations'
+import { useAdminGames } from '@/hooks/useAdminGames'
 import { gameFormSchema, type GameFormData } from '@/schemas/gameSchema'
 import { GAME_ENTRY, OUTCOME } from '@/constants/config'
 import {
@@ -35,6 +36,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+
+type FormMode = 'create' | 'edit'
 
 const emptyResult = () => ({
   player_id: '',
@@ -44,8 +48,12 @@ const emptyResult = () => ({
 })
 
 export const GameEntryForm = () => {
+  const [mode, setMode] = useState<FormMode>('create')
+  const [selectedGameId, setSelectedGameId] = useState('')
+  const pendingPodPopulation = useRef<string | null>(null)
   const { data: pods = [], isLoading: podsLoading } = usePods()
-  const { createGame } = useGameMutations()
+  const { data: games = [], isLoading: gamesLoading } = useAdminGames()
+  const { createGame, updateGame } = useGameMutations()
 
   const form = useForm<GameFormData>({
     resolver: zodResolver(gameFormSchema),
@@ -71,35 +79,89 @@ export const GameEntryForm = () => {
   })
 
   useEffect(() => {
-    if (!selectedPodId || podPlayers.length === 0) {
+    if (
+      !selectedPodId ||
+      pendingPodPopulation.current !== selectedPodId ||
+      podPlayers.length === 0
+    ) {
       return
     }
 
-    const results = podPlayers.map(player => ({
-      player_id: String(player.id),
-      deck_id: '',
-      outcome: '' as const,
-      unsatisfying: false,
-    }))
-
-    replace(results)
-  }, [selectedPodId, podPlayers, replace])
-
-  const onSubmit = async (data: GameFormData) => {
-    try {
-      await createGame.mutateAsync(data)
-      toast.success('Game recorded successfully!')
-      const currentResults = form.getValues('results')
-      const resetResults = currentResults.map(result => ({
-        ...result,
+    replace(
+      podPlayers.map(player => ({
+        player_id: String(player.id),
+        deck_id: '',
         outcome: '' as const,
         unsatisfying: false,
       }))
-      form.setValue('results', resetResults)
-      form.setValue('notes', '')
+    )
+    pendingPodPopulation.current = null
+  }, [selectedPodId, podPlayers, replace])
+
+  const resetCreateForm = () => {
+    form.reset({
+      pod_id: '',
+      game_date: new Date().toISOString().split('T')[0],
+      notes: '',
+      results: Array.from(
+        { length: GAME_ENTRY.DEFAULT_PLAYER_COUNT },
+        emptyResult
+      ),
+    })
+  }
+
+  const handleModeChange = (value: string) => {
+    setMode(value as FormMode)
+    setSelectedGameId('')
+    pendingPodPopulation.current = null
+    resetCreateForm()
+  }
+
+  const handleGameChange = (gameId: string) => {
+    setSelectedGameId(gameId)
+    pendingPodPopulation.current = null
+    const game = games.find(item => item.id === gameId)
+    if (!game) return
+
+    form.reset({
+      pod_id: game.pod_id,
+      game_date: game.played_at.slice(0, 10),
+      notes: game.notes ?? '',
+      results: game.results.map(result => ({ ...result })),
+    })
+  }
+
+  const handlePodChange = (
+    podId: string,
+    onChange: (value: string) => void
+  ) => {
+    pendingPodPopulation.current = podId
+    onChange(podId)
+  }
+
+  const onSubmit = async (data: GameFormData) => {
+    try {
+      if (mode === 'edit') {
+        if (!selectedGameId) return
+        await updateGame.mutateAsync({ id: selectedGameId, input: data })
+        toast.success('Game updated successfully!')
+      } else {
+        await createGame.mutateAsync(data)
+        toast.success('Game recorded successfully!')
+        const currentResults = form.getValues('results')
+        const resetResults = currentResults.map(result => ({
+          ...result,
+          outcome: '' as const,
+          unsatisfying: false,
+        }))
+        form.setValue('results', resetResults)
+        form.setValue('notes', '')
+      }
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : 'Failed to record game'
+        error instanceof Error
+          ? error.message
+          : `Failed to ${mode === 'edit' ? 'update' : 'record'} game`
       )
     }
   }
@@ -120,15 +182,61 @@ export const GameEntryForm = () => {
     }
   }
 
-  const isLoading = podsLoading || podPlayersLoading || createGame.isPending
+  const isLoading =
+    podsLoading ||
+    gamesLoading ||
+    podPlayersLoading ||
+    createGame.isPending ||
+    updateGame.isPending
+  const isFormDisabled = isLoading || (mode === 'edit' && !selectedGameId)
+
+  let submitLabel = mode === 'edit' ? 'Update Game' : 'Record Game'
+  if (updateGame.isPending) submitLabel = 'Updating...'
+  if (createGame.isPending) submitLabel = 'Recording...'
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Record New Game</CardTitle>
-        <CardDescription>Enter game details and player results</CardDescription>
+        <CardTitle>Game Management</CardTitle>
+        <CardDescription>
+          Record a new game or modify an existing one
+        </CardDescription>
       </CardHeader>
       <CardContent>
+        <Tabs value={mode} onValueChange={handleModeChange} className="mb-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="create">Add Game</TabsTrigger>
+            <TabsTrigger value="edit">Modify Game</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {mode === 'edit' && (
+          <div className="mb-6 space-y-2">
+            <label className="text-sm font-medium" htmlFor="game-to-edit">
+              Game to modify
+            </label>
+            <Select
+              value={selectedGameId}
+              onValueChange={handleGameChange}
+              disabled={isLoading}
+            >
+              <SelectTrigger id="game-to-edit">
+                <SelectValue placeholder="Select a game" />
+              </SelectTrigger>
+              <SelectContent>
+                {games.map(game => (
+                  <SelectItem key={game.id} value={game.id}>
+                    {game.played_at.slice(0, 10)} —{' '}
+                    {pods.find(pod => String(pod.id) === game.pod_id)?.name ??
+                      `Pod ${game.pod_id}`}{' '}
+                    — Game #{game.id}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -139,9 +247,11 @@ export const GameEntryForm = () => {
                   <FormItem>
                     <FormLabel>Pod</FormLabel>
                     <Select
-                      onValueChange={field.onChange}
+                      onValueChange={value =>
+                        handlePodChange(value, field.onChange)
+                      }
                       value={field.value}
-                      disabled={isLoading}
+                      disabled={isFormDisabled}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -171,7 +281,7 @@ export const GameEntryForm = () => {
                       <Input
                         type="date"
                         {...field}
-                        disabled={isLoading}
+                        disabled={isFormDisabled}
                         className="[&::-webkit-calendar-picker-indicator]:invert [&::-webkit-calendar-picker-indicator]:opacity-70"
                       />
                     </FormControl>
@@ -191,7 +301,7 @@ export const GameEntryForm = () => {
                     <Textarea
                       placeholder="Add any notes about this game..."
                       {...field}
-                      disabled={isLoading}
+                      disabled={isFormDisabled}
                       rows={2}
                     />
                   </FormControl>
@@ -211,7 +321,7 @@ export const GameEntryForm = () => {
                   index={index}
                   form={form}
                   podPlayers={podPlayers}
-                  isLoading={isLoading}
+                  isLoading={isFormDisabled}
                   onOutcomeChange={handleOutcomeChange}
                 />
               ))}
@@ -219,8 +329,8 @@ export const GameEntryForm = () => {
 
             <FormMessage>{form.formState.errors.results?.message}</FormMessage>
 
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {createGame.isPending ? 'Recording...' : 'Record Game'}
+            <Button type="submit" className="w-full" disabled={isFormDisabled}>
+              {submitLabel}
             </Button>
           </form>
         </Form>
@@ -256,13 +366,11 @@ const PlayerResultFields = ({
   )
 
   useEffect(() => {
-    if (selectedPlayerId) {
-      form.setValue(`results.${index}.deck_id`, '')
-    }
-  }, [selectedPlayerId, form, index])
-
-  useEffect(() => {
-    if (decks.length === 1 && selectedPlayerId) {
+    if (
+      decks.length === 1 &&
+      selectedPlayerId &&
+      !form.getValues(`results.${index}.deck_id`)
+    ) {
       form.setValue(`results.${index}.deck_id`, String(decks[0].id))
     }
   }, [decks, selectedPlayerId, form, index])
@@ -283,7 +391,10 @@ const PlayerResultFields = ({
             <FormItem>
               <FormLabel>Player</FormLabel>
               <Select
-                onValueChange={field.onChange}
+                onValueChange={value => {
+                  field.onChange(value)
+                  form.setValue(`results.${index}.deck_id`, '')
+                }}
                 value={field.value}
                 disabled={isLoading}
               >

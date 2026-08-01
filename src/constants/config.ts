@@ -114,6 +114,7 @@ export const QUERY_KEYS = {
   DECKS: 'decks',
   USER_PROFILE: 'user_profile',
   GAME_HISTORY: 'game_history',
+  ADMIN_GAMES: 'admin_games',
   POD_MEMBERS: 'pod_members',
 } as const
 
