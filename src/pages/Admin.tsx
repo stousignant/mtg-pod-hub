@@ -1,8 +1,9 @@
-import { Shield, Gamepad2, Database, Users } from 'lucide-react'
+import { Shield, Gamepad2, Database, Users, Boxes } from 'lucide-react'
 import Header from '@/components/Header'
 import { GameEntryForm } from '@/components/GameEntryForm'
 import { DeckManagementForm } from '@/components/DeckManagementForm'
 import { PlayerManagementForm } from '@/components/PlayerManagementForm'
+import { PodManagementForm } from '@/components/PodManagementForm'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export const Admin = () => {
@@ -23,7 +24,7 @@ export const Admin = () => {
         </div>
 
         <Tabs defaultValue="games" className="space-y-6">
-          <TabsList className="grid h-auto w-full grid-cols-3 bg-muted/50 border border-border">
+          <TabsList className="grid h-auto w-full grid-cols-2 sm:grid-cols-4 bg-muted/50 border border-border">
             <TabsTrigger
               value="games"
               className="flex-1 min-w-0 data-[state=active]:bg-primary/20 data-[state=active]:text-primary gap-2"
@@ -49,6 +50,14 @@ export const Admin = () => {
               <Users className="h-4 w-4 shrink-0" />
               <span>Players</span>
             </TabsTrigger>
+
+            <TabsTrigger
+              value="pods"
+              className="min-w-0 gap-2 px-2 data-[state=active]:bg-primary/20 data-[state=active]:text-primary"
+            >
+              <Boxes className="h-4 w-4 shrink-0" />
+              <span>Pods</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="games">
@@ -61,6 +70,10 @@ export const Admin = () => {
 
           <TabsContent value="players">
             <PlayerManagementForm />
+          </TabsContent>
+
+          <TabsContent value="pods">
+            <PodManagementForm />
           </TabsContent>
         </Tabs>
       </main>
