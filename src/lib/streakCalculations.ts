@@ -10,83 +10,68 @@ export interface DeckStreaks {
   worstLoseStreak: number
 }
 
+const calculateStreakMetrics = (games: GameHistoryEntry[]) => {
+  const sortedGames = [...games].sort((a, b) => {
+    const dateCompare = a.played_at.localeCompare(b.played_at)
+    if (dateCompare !== 0) return dateCompare
+    return a.game_id - b.game_id
+  })
+  let bestWinStreak = 0
+  let worstLoseStreak = 0
+  let tempWinStreak = 0
+  let tempLoseStreak = 0
+
+  for (const game of sortedGames) {
+    const isWin = game.outcome === OUTCOME.WIN && !game.unsatisfying
+    const isLoss = game.outcome === OUTCOME.LOSS
+
+    if (isWin) {
+      tempWinStreak++
+      tempLoseStreak = 0
+      bestWinStreak = Math.max(bestWinStreak, tempWinStreak)
+    } else if (isLoss) {
+      tempLoseStreak++
+      tempWinStreak = 0
+      worstLoseStreak = Math.max(worstLoseStreak, tempLoseStreak)
+    } else {
+      tempWinStreak = 0
+      tempLoseStreak = 0
+    }
+  }
+
+  return {
+    deckName: sortedGames[0]?.deck_name ?? '',
+    currentStreak: Math.max(tempWinStreak, tempLoseStreak),
+    currentStreakType:
+      tempWinStreak > 0
+        ? ('win' as const)
+        : tempLoseStreak > 0
+          ? ('loss' as const)
+          : null,
+    bestWinStreak,
+    worstLoseStreak,
+  }
+}
+
 export const calculateDeckStreaks = (
   gameHistory: GameHistoryEntry[]
 ): Map<string, DeckStreaks> => {
-  const deckStreaksMap = new Map<string, DeckStreaks>()
+  const deckGames = new Map<string, GameHistoryEntry[]>()
 
-  const deckGamesMap = new Map<string, GameHistoryEntry[]>()
   for (const entry of gameHistory) {
     const deckId = String(entry.deck_id)
-    if (!deckGamesMap.has(deckId)) {
-      deckGamesMap.set(deckId, [])
+    const games = deckGames.get(deckId)
+    if (games) {
+      games.push(entry)
+    } else {
+      deckGames.set(deckId, [entry])
     }
-    deckGamesMap.get(deckId)!.push(entry)
   }
 
-  for (const [deckId, games] of deckGamesMap.entries()) {
-    const sortedGames = [...games].sort((a, b) => {
-      const dateCompare = a.played_at.localeCompare(b.played_at)
-      if (dateCompare !== 0) return dateCompare
-      return a.game_id - b.game_id
-    })
-
-    let currentStreak = 0
-    let currentStreakType: 'win' | 'loss' | null = null
-    let bestWinStreak = 0
-    let worstLoseStreak = 0
-
-    let tempWinStreak = 0
-    let tempLoseStreak = 0
-
-    for (const game of sortedGames) {
-      const isWin = game.outcome === OUTCOME.WIN && !game.unsatisfying
-      const isLoss = game.outcome === OUTCOME.LOSS
-      const isDraw = game.outcome === OUTCOME.DRAW
-
-      if (isWin) {
-        tempWinStreak++
-        tempLoseStreak = 0
-
-        if (currentStreakType === 'win' || currentStreakType === null) {
-          currentStreak = tempWinStreak
-          currentStreakType = 'win'
-        } else {
-          currentStreak = 1
-          currentStreakType = 'win'
-        }
-
-        bestWinStreak = Math.max(bestWinStreak, tempWinStreak)
-      } else if (isLoss) {
-        tempLoseStreak++
-        tempWinStreak = 0
-
-        if (currentStreakType === 'loss' || currentStreakType === null) {
-          currentStreak = tempLoseStreak
-          currentStreakType = 'loss'
-        } else {
-          currentStreak = 1
-          currentStreakType = 'loss'
-        }
-
-        worstLoseStreak = Math.max(worstLoseStreak, tempLoseStreak)
-      } else if (isDraw) {
-        tempWinStreak = 0
-        tempLoseStreak = 0
-        currentStreak = 0
-        currentStreakType = null
-      }
-    }
-
-    deckStreaksMap.set(deckId, {
+  return new Map(
+    [...deckGames.entries()].map(([deckId, games]) => [
       deckId,
-      deckName: sortedGames[0]?.deck_name || '',
-      currentStreak,
-      currentStreakType,
-      bestWinStreak,
-      worstLoseStreak,
-    })
-  }
-
-  return deckStreaksMap
+      { deckId, ...calculateStreakMetrics(games) },
+    ])
+  )
 }
