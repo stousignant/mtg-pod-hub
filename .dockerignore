@@ -47,4 +47,3 @@ docker-compose*.yml
 
 # Misc
 .husky
-.pre-commit-config.yaml
