@@ -198,6 +198,8 @@ interface DeckStatsEntry {
 
 ### Essential Commands
 
+Run `just check` (lint, format check, tests, build; requires [just](https://just.systems)) before handing off or opening a PR.
+
 ```bash
 npm run dev          # Start dev server (port 8080)
 npm run build        # Production build
